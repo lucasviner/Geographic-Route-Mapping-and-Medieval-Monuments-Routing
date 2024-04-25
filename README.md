@@ -7,3 +7,11 @@ Ha de contenir:
 
 El més díficil es montar el graf i simplificar-ho.
 Fer servir les llibreries!!
+
+
+Passos per construir el mapa
+1) Tenim els diferents punts, que son senders.
+2) Agrupem aquests en clusters, on seran representats per un centroide.
+3) Creem un graf, on els vertexs son els centroides i les arestes si hi ha un sender entre dos d'aquests
+4) Simplifiquem el graf
+5) Associem els monuments als centroides més propers. 
