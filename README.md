@@ -4,3 +4,6 @@ Ha de contenir:
 3) Obtenir les coordenades de monuments medievals.
 4) Trobar rutes òptimes per arribar a monuments medievals en el graf inferit.
 5) Visualitzar els mapes resultants en 2D i 3D.
+
+El més díficil es montar el graf i simplificar-ho.
+Fer servir les llibreries!!
