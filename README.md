@@ -14,4 +14,17 @@ Passos per construir el mapa
 2) Agrupem aquests en clusters, on seran representats per un centroide.
 3) Creem un graf, on els vertexs son els centroides i les arestes si hi ha un sender entre dos d'aquests
 4) Simplifiquem el graf
-5) Associem els monuments als centroides més propers. 
+5) Associem els monuments als centroides més propers.
+
+Coses a fer:
+1) Acabar segments:
+  - cook data
+  - Modificar per posar-ho com tothom
+2) Monuments queda
+3) Graphmaker
+  - simplificar
+  - Numpy
+  - modificacions arestes(jordi foto)
+4) Viewer
+5) Routes
+6) Main
