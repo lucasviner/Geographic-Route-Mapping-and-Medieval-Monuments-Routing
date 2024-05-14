@@ -1,23 +1,23 @@
-from graphmaker import *
+from graphmaker import * #type : ignore
 from segments import *
-from staticmap import StaticMap, CircleMaker, Line
-import networkx as nx
+from staticmap import StaticMap, CircleMarker, Line #type : ignore
+import networkx as nx #type : ignore
 from fastkml import kml, geometry
 
 def export_PNG(graph: nx.Graph, filename: str) -> None:
     """Export the graph to a PNG file using staticmap."""
-    static_map = StaticMap(800.600)
+    static_map = StaticMap(800, 600)
+    
     for aresta in graph.edges():
         pos_ini = graph.nodes[aresta[0]]["pos"]
         pos_fin = graph.nodes[aresta[1]]["pos"]
-        linia = Line([pos_ini,pos_fin],"blue",2)
+        linia = Line([pos_ini, pos_fin], "blue", 2)
         static_map.add_line(linia)
-        #Pensar com posar-ho en una funció
 
     for node in graph.nodes():
         pos = graph.nodes[node]["pos"]
-        vertex =  CircleMaker(pos,"red",6)
-        static_map.add_maker(vertex)
+        vertex = CircleMarker(pos,"red",6)
+        static_map.add_marker(vertex)
     imatge = static_map.render()
     imatge.save(filename)
 
@@ -35,7 +35,6 @@ def export_KML(graph: nx.Graph, filename: str) -> None:
         marca.geometry = punt
         doc.append(marca)
 
-
     for aresta in graph.edges():
         start_pos = graph.nodes[aresta[0]]['pos']
         end_pos = graph.nodes[aresta[1]]['pos']
@@ -48,6 +47,6 @@ def export_KML(graph: nx.Graph, filename: str) -> None:
             fitxer.write(k.to_string())
 
 segments = load_segments('filename.txt')
-graph = make_graph(segments, 5)
+graph = make_graph(segments, 20)
 export_PNG(graph, 'graph.png')
 export_KML(graph, 'graph.kml')
