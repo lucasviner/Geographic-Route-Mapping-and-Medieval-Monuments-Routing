@@ -19,12 +19,10 @@ Passos per construir el mapa
 Coses a fer:
 1) Acabar segments:
   - cook data
-  - Modificar per posar-ho com tothom
-2) Monuments queda
+2) Monuments revisar
 3) Graphmaker
   - simplificar
-  - Numpy
   - modificacions arestes(jordi foto)
-4) Viewer
-5) Routes
-6) Main
+4) Viewer revisar
+5) Routes fer
+6) Main fer
