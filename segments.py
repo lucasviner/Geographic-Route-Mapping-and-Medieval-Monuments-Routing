@@ -3,7 +3,6 @@ from dataclasses import dataclass
 import requests, gpxpy
 from staticmap import StaticMap, Line
 
-
 @dataclass
 class Point:
     lat: float
@@ -22,7 +21,7 @@ class Box:
 Segments: TypeAlias = list[Segment]
 
 def download_segments(box: Box, filename: str) -> None:
-    """Download all segments in the box and save them to the file."""
+    """ Download all segments in the box and save them to the file."""
     page = 0
     f = open(filename, 'w')
     while True:
@@ -32,15 +31,29 @@ def download_segments(box: Box, filename: str) -> None:
         gpx = gpxpy.parse(gpx_content)
         if len(gpx.tracks) == 0:
             break
+        freq = 60
         for track in gpx.tracks:
             for segment in track.segments:
                 if all(point.time is not None for point in segment.points):
-                    segment.points.sort(key=lambda p: p.time)  # type: ignore
-                    p1, p2 = segment.points[0], segment.points[-1]
-                    # Si volguèssim, també podriem accedir al temps de cada punt
-                    f.write(f"{p1.latitude},{p1.longitude},{p2.latitude},{p2.longitude}\n")
+                    segment.points.sort(key=lambda p: p.time) # type: ignore  
+                    #cook_data()
+                    for i in range(len(segment.points) - 1):
+                        p1 = segment.points[i]
+                        if i + freq < len(segment.points):
+                            p2 = segment.points[i + freq]
+                        else:
+                            p2 = segment.points[i + 1]
+                        # Si volguèssim, també podriem accedir al temps de cada punt
+                        f.write(f"{p1.latitude},{p1.longitude},{p2.latitude},{p2.longitude}\n")
         page += 1
     f.close()
+
+
+'''def cook_data(segments):
+    """ Realitza una neteja de dades, on al detectar anomàlies en les dades les suprimeix. """
+    return segments
+'''
+
 
 def load_segments(filename: str) -> Segments:
     """ Load segments from the file. """
@@ -65,26 +78,32 @@ def get_segments(box: Box, filename: str) -> Segments:
     except FileNotFoundError:
         download_segments(box, filename)
         segments = load_segments(filename)
+        f = open(filename, 'w')
+        for segment in segments:
+            p1 = segment.start
+            p2 = segment.end
+            f.write(f"{p1.lat},{p1.lon},{p2.lat},{p2.lon}\n")
+        f.close()
     return segments
 
 def show_segments(segments: Segments, filename: str) -> None:
     """Show all segments in a PNG file using staticmaps."""
-    static_map = StaticMap(800, 600)  # Tamaño del mapa
+    static_map = StaticMap(800, 600)
 
-    # Agregar líneas para cada segmento
     for segment in segments:
         start_point = segment.start
         end_point = segment.end
         line = Line(((start_point.lon, start_point.lat), (end_point.lon, end_point.lat)), 'blue', 2)
-        static_map.add_line(line)
+        static_map.add_line(line) # type: ignore
 
-    image = static_map.render()
-    image.save(filename)
+    image = static_map.render() # type: ignore
+    image.save(filename) # type: ignore
 
 
 
 #COMPROVAR QUE FUNCIONEN
 
 #print(load_segments("filename.txt"))
+#print(get_segments(Box(Point(40.5363713, 0.5739316671), Point(40.79886535, 0.9021482)), "filenamee.txt"))
 #show_segments(get_segments(Box(Point(40.5363713, 0.5739316671), Point(40.79886535, 0.9021482)), "filename.txt"),"foto.png")
 #download_segments(Box(Point(40.5363713, 0.5739316671), Point(40.79886535, 0.9021482)), "filename.txt")
