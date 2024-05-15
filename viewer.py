@@ -9,9 +9,11 @@ def export_PNG(graph: nx.Graph, filename: str) -> None:
     static_map = StaticMap(800, 600)
     
     for aresta in graph.edges():
-        pos_ini = graph.nodes[aresta[0]]["pos"]
-        pos_fin = graph.nodes[aresta[1]]["pos"]
-        linia = Line([pos_ini, pos_fin], "blue", 2)
+        pos_ini_ent = graph.nodes[aresta[0]]["pos"][0]
+        pos_ini_sort = graph.nodes[aresta[0]]["pos"][1]
+        pos_fin_ent = graph.nodes[aresta[1]]["pos"][0]
+        pos_fin_sort = graph.nodes[aresta[1]]["pos"][1]
+        linia = Line([(pos_ini_ent, pos_ini_sort), (pos_fin_ent,pos_fin_sort)], "blue", 2)
         static_map.add_line(linia)
 
     for node in graph.nodes():
@@ -39,7 +41,7 @@ def export_KML(graph: nx.Graph, filename: str) -> None:
         start_pos = graph.nodes[aresta[0]]['pos']
         end_pos = graph.nodes[aresta[1]]['pos']
         linia = geometry.LineString([start_pos, end_pos])
-        marca = kml.Placemark(ns, f'edge_{edge[0]}_{edge[1]}', f'Edge from {edge[0]} to {edge[1]}')
+        marca = kml.Placemark(ns, f'edge_{aresta[0]}_{aresta[1]}', f'edge from {aresta[0]} to {aresta[1]}')
         marca.geometry = linia
         doc.append(marca)
 
