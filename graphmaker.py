@@ -1,6 +1,6 @@
-import networkx as nx #type: ignore 
-from sklearn.cluster import KMeans #type: ignore 
-from segments import * #type: ignore 
+import networkx as nx 
+from sklearn.cluster import KMeans 
+from segments import * 
 import numpy as np
 import matplotlib.pyplot as plt
 
@@ -10,9 +10,9 @@ def make_graph(segments: list[Segment], clusters: int) -> nx.Graph:
     punts = segments_a_numpy(segments)
     
     kmeans = KMeans(clusters)
-    kmeans.fit(punts) # type: ignore
-    centroides = kmeans.cluster_centers_ # type: ignore retorna una tripleta amb el numero de centroid i la tupla altitud latitud
-    etiquetas = kmeans.labels_ # type: ignore llista de enters que diu a quin centroid pertany cada punt
+    kmeans.fit(punts) 
+    centroides = kmeans.cluster_centers_  #retorna una tripleta amb el numero de centroid i la tupla altitud latitud
+    etiquetas = kmeans.labels_  #llista de enters que diu a quin centroid pertany cada punt
     graf = nx.Graph()
     for i, centroid in enumerate(centroides):
         graf.add_node(i, pos = centroid)
@@ -22,7 +22,7 @@ def make_graph(segments: list[Segment], clusters: int) -> nx.Graph:
     return graf
     
 def segments_a_numpy(segments: list[Segment]) -> np.array:
-    points = []
+    points: list[Point] = []
     for segment in segments:
         if segment.start and segment.end:
             points.append(segment.start)

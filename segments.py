@@ -1,7 +1,7 @@
 from typing import TypeAlias
 from dataclasses import dataclass
 import requests, gpxpy
-from staticmap import StaticMap, Line
+from staticmap import StaticMap, Line #type: ignore 
 
 @dataclass
 class Point:
@@ -25,24 +25,19 @@ def download_segments(box: Box, filename: str) -> None:
     page = 0
     f = open(filename, 'w')
     while True:
-        url = f"https://api.openstreetmap.org/api/0.6/trackpoints?bbox={box.bottom_left.lon,box.bottom_left.lat,box.top_right.lon,box.top_right.lat}&page={page}"
+        url = f"https://api.openstreetmap.org/api/0.6/trackpoints?bbox={box.bottom_left.lon},{box.bottom_left.lat},{box.top_right.lon},{box.top_right.lat}&page={page}"
         response = requests.get(url)            
         gpx_content = response.content.decode("utf-8")
         gpx = gpxpy.parse(gpx_content)
         if len(gpx.tracks) == 0:
             break
-        freq = 60
         for track in gpx.tracks:
             for segment in track.segments:
                 if all(point.time is not None for point in segment.points):
                     segment.points.sort(key=lambda p: p.time) # type: ignore  
                     #cook_data()
                     for i in range(len(segment.points) - 1):
-                        p1 = segment.points[i]
-                        if i + freq < len(segment.points):
-                            p2 = segment.points[i + freq]
-                        else:
-                            p2 = segment.points[i + 1]
+                        p1, p2 = segment.points[i], segment.points[i + 1]
                         # Si volguèssim, també podriem accedir al temps de cada punt
                         f.write(f"{p1.latitude},{p1.longitude},{p2.latitude},{p2.longitude}\n")
         page += 1
@@ -60,9 +55,9 @@ def load_segments(filename: str) -> Segments:
     segments: Segments = []
     file = open(filename, 'r')
     for line in file:
-        start_lat, start_lon, end_lat, end_lon = map(float, line.strip().split(','))
-        start_point = Point(start_lat, start_lon)
-        end_point = Point(end_lat, end_lon)
+        bottom_left_lon, bottom_left_lat, top_right_lon, top_right_lat = map(float, line.strip().split(','))
+        start_point = Point(bottom_left_lat, bottom_left_lon)
+        end_point = Point(top_right_lat, top_right_lon)
         segment = Segment(start_point, end_point)
         segments.append(segment)
     return segments
@@ -78,13 +73,17 @@ def get_segments(box: Box, filename: str) -> Segments:
     except FileNotFoundError:
         download_segments(box, filename)
         segments = load_segments(filename)
-        f = open(filename, 'w')
-        for segment in segments:
-            p1 = segment.start
-            p2 = segment.end
-            f.write(f"{p1.lat},{p1.lon},{p2.lat},{p2.lon}\n")
-        f.close()
+        save_segments(segments, filename)
     return segments
+
+def save_segments(segments: Segments, filename: str) -> None:
+    """ Saves the segments to the file. """
+    f = open(filename, 'w')
+    for segment in segments:
+        p1 = segment.start
+        p2 = segment.end
+        f.write(f"{p1.lat},{p1.lon},{p2.lat},{p2.lon}\n")
+    f.close()
 
 def show_segments(segments: Segments, filename: str) -> None:
     """Show all segments in a PNG file using staticmaps."""
@@ -94,10 +93,10 @@ def show_segments(segments: Segments, filename: str) -> None:
         start_point = segment.start
         end_point = segment.end
         line = Line(((start_point.lon, start_point.lat), (end_point.lon, end_point.lat)), 'blue', 2)
-        static_map.add_line(line) # type: ignore
+        static_map.add_line(line) 
 
-    image = static_map.render() # type: ignore
-    image.save(filename) # type: ignore
+    image = static_map.render() 
+    image.save(filename) 
 
 
 

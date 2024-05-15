@@ -2,7 +2,8 @@ from graphmaker import * #type : ignore
 from segments import *
 from staticmap import StaticMap, CircleMarker, Line #type : ignore
 import networkx as nx #type : ignore
-from fastkml import kml, geometry
+from fastkml import *
+from shapely.geometry import Point, LineString
 
 def export_PNG(graph: nx.Graph, filename: str) -> None:
     """Export the graph to a PNG file using staticmap."""
@@ -25,23 +26,25 @@ def export_PNG(graph: nx.Graph, filename: str) -> None:
 
 def export_KML(graph: nx.Graph, filename: str) -> None:
     """Export the graph to a KML file."""
-    k = kml.KML()
+    k = KML()
     ns = '{http://www.opengis.net/kml/2.2}'
-    doc = kml.Document(ns, 'docid', 'Graph', 'Graph KML')
+    doc = Document(ns, 'docid', 'Graph', 'Graph KML')
     k.append(doc)
 
     for node in graph.nodes():
-        pos = graph.nodes[node]['pos']
-        punt = geometry.Point(pos)
-        marca = kml.Placemark(ns, str(node), str(node))
+        pos_1 = graph.nodes[node]['pos'][0]
+        pos_2 = graph.nodes[node]['pos'][1]
+        #print(pos_1,pos_2)
+        punt = Point(float(pos_1),float(pos_2)) 
+        marca = Placemark(ns, str(node), str(node))
         marca.geometry = punt
         doc.append(marca)
 
     for aresta in graph.edges():
         start_pos = graph.nodes[aresta[0]]['pos']
         end_pos = graph.nodes[aresta[1]]['pos']
-        linia = geometry.LineString([start_pos, end_pos])
-        marca = kml.Placemark(ns, f'edge_{aresta[0]}_{aresta[1]}', f'edge from {aresta[0]} to {aresta[1]}')
+        linia = LineString([start_pos, end_pos])
+        marca = Placemark(ns, f'edge_{aresta[0]}_{aresta[1]}', f'edge from {aresta[0]} to {aresta[1]}')
         marca.geometry = linia
         doc.append(marca)
 
@@ -49,6 +52,6 @@ def export_KML(graph: nx.Graph, filename: str) -> None:
             fitxer.write(k.to_string())
 
 segments = load_segments('filename.txt')
-graph = make_graph(segments, 20)
+graph = make_graph(segments, 100)
 export_PNG(graph, 'graph.png')
 export_KML(graph, 'graph.kml')
