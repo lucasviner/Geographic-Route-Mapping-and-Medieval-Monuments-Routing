@@ -25,4 +25,5 @@ Coses a fer:
   - modificacions arestes(jordi foto)
 4) Viewer revisar
 5) Routes fer
+Mirar si hi ha incongruencies en la funcio find_routes amb el que retorna
 6) Main fer
