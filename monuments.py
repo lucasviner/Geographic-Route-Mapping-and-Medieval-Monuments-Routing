@@ -90,4 +90,4 @@ def save_monuments(monuments: Monuments, filename: str) -> None:
 
 #COMPROVACIÓ
 
-print(get_monuments('filenamee.txt'))
+print(get_monuments('filename.txt'))
