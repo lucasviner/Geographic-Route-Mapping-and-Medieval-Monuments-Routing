@@ -1,32 +1,39 @@
 from typing import TypeAlias
 from dataclasses import dataclass
 import requests, gpxpy
-from staticmap import StaticMap, Line #type: ignore 
+from staticmap import StaticMap, Line  # type: ignore
+from datetime import datetime
+import haversine
+
 
 @dataclass
 class Point:
     lat: float
     lon: float
 
+
 @dataclass
 class Segment:
     start: Point
     end: Point
+
 
 @dataclass
 class Box:
     bottom_left: Point
     top_right: Point
 
+
 Segments: TypeAlias = list[Segment]
 
+
 def download_segments(box: Box, filename: str) -> None:
-    """ Download all segments in the box and save them to the file."""
+    """Download all segments in the box and save them to the file."""
     page = 0
-    f = open(filename, 'w')
+    f = open(filename, "w")
     while True:
         url = f"https://api.openstreetmap.org/api/0.6/trackpoints?bbox={box.bottom_left.lon},{box.bottom_left.lat},{box.top_right.lon},{box.top_right.lat}&page={page}"
-        response = requests.get(url)            
+        response = requests.get(url)
         gpx_content = response.content.decode("utf-8")
         gpx = gpxpy.parse(gpx_content)
         if len(gpx.tracks) == 0:
@@ -34,33 +41,48 @@ def download_segments(box: Box, filename: str) -> None:
         for track in gpx.tracks:
             for segment in track.segments:
                 if all(point.time is not None for point in segment.points):
-                    segment.points.sort(key=lambda p: p.time) # type: ignore  
-                    #cook_data()
+                    segment.points.sort(key=lambda p: p.time)  # type: ignore
                     for i in range(len(segment.points) - 1):
                         p1, p2 = segment.points[i], segment.points[i + 1]
-                        # Si volguèssim, també podriem accedir al temps de cada punt
-                        f.write(f"{p1.latitude},{p1.longitude},{p2.latitude},{p2.longitude}\n")
+                        if cook_data(p1, p2):
+                            # Si volguèssim, també podriem accedir al temps de cada punt
+                            f.write(
+                                f"{p1.latitude},{p1.longitude},{p2.latitude},{p2.longitude}\n"
+                            )
         page += 1
     f.close()
 
 
-'''def cook_data(segments):
-    """ Realitza una neteja de dades, on al detectar anomàlies en les dades les suprimeix. """
-    return segments
-'''
+def cook_data(p1: gpxpy.gpx.GPXTrackPoint, p2: gpxpy.gpx.GPXTrackPoint) -> bool:
+    """Realitza una neteja de dades, on al detectar anomàlies en les dades les suprimeix."""
+    time1 = datetime.strptime(str(p1.time), "%Y-%m-%d %H:%M:%S%z")
+    time2 = datetime.strptime(str(p2.time), "%Y-%m-%d %H:%M:%S%z")
+    if time1.year < 2005 or time2.year < 2005:
+        return False  # Registre erroni
+    if (
+        haversine.haversine(
+            (p1.latitude, p1.longitude), (p2.latitude, p2.longitude), unit="m"
+        )
+        >= 100
+    ):
+        return False
+    return True
 
 
 def load_segments(filename: str) -> Segments:
-    """ Load segments from the file. """
+    """Load segments from the file."""
     segments: Segments = []
-    file = open(filename, 'r')
+    file = open(filename, "r")
     for line in file:
-        bottom_left_lon, bottom_left_lat, top_right_lon, top_right_lat = map(float, line.strip().split(','))
+        bottom_left_lon, bottom_left_lat, top_right_lon, top_right_lat = map(
+            float, line.strip().split(",")
+        )
         start_point = Point(bottom_left_lat, bottom_left_lon)
         end_point = Point(top_right_lat, top_right_lon)
         segment = Segment(start_point, end_point)
         segments.append(segment)
     return segments
+
 
 def get_segments(box: Box, filename: str) -> Segments:
     """
@@ -73,17 +95,8 @@ def get_segments(box: Box, filename: str) -> Segments:
     except FileNotFoundError:
         download_segments(box, filename)
         segments = load_segments(filename)
-        save_segments(segments, filename)
     return segments
 
-def save_segments(segments: Segments, filename: str) -> None:
-    """ Saves the segments to the file. """
-    f = open(filename, 'w')
-    for segment in segments:
-        p1 = segment.start
-        p2 = segment.end
-        f.write(f"{p1.lat},{p1.lon},{p2.lat},{p2.lon}\n")
-    f.close()
 
 def show_segments(segments: Segments, filename: str) -> None:
     """Show all segments in a PNG file using staticmaps."""
@@ -92,17 +105,20 @@ def show_segments(segments: Segments, filename: str) -> None:
     for segment in segments:
         start_point = segment.start
         end_point = segment.end
-        line = Line(((start_point.lon, start_point.lat), (end_point.lon, end_point.lat)), 'blue', 2)
-        static_map.add_line(line) 
+        line = Line(
+            ((start_point.lon, start_point.lat), (end_point.lon, end_point.lat)),
+            "blue",
+            2,
+        )
+        static_map.add_line(line)
 
-    image = static_map.render() 
-    image.save(filename) 
+    image = static_map.render()
+    image.save(filename)
 
 
+# COMPROVAR QUE FUNCIONEN
 
-#COMPROVAR QUE FUNCIONEN
-
-#print(load_segments("filename.txt"))
-#print(get_segments(Box(Point(40.5363713, 0.5739316671), Point(40.79886535, 0.9021482)), "filenamee.txt"))
-#show_segments(get_segments(Box(Point(40.5363713, 0.5739316671), Point(40.79886535, 0.9021482)), "filename.txt"),"foto.png")
-#download_segments(Box(Point(40.5363713, 0.5739316671), Point(40.79886535, 0.9021482)), "filename.txt")
+# print(load_segments("filename.txt"))
+# print(get_segments(Box(Point(40.5363713, 0.5739316671), Point(40.79886535, 0.9021482)), "filenamee.txt"))
+# show_segments(get_segments(Box(Point(40.5363713, 0.5739316671), Point(40.79886535, 0.9021482)), "filename.txt"),"foto.png")
+# download_segments(Box(Point(40.5363713, 0.5739316671), Point(40.79886535, 0.9021482)), "filename.txt")
