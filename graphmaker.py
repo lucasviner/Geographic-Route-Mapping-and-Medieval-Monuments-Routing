@@ -18,6 +18,9 @@ def make_graph(segments: list[Segment], clusters: int) -> nx.Graph:
         graf.add_node(i, pos = centroid)
     aristas = arestes(etiquetas)
     graf.add_edges_from(aristas)
+    
+    nodes_to_remove = [node for node in graf.nodes() if graf.degree[node] == 0]
+    graf.remove_nodes_from(nodes_to_remove)
 
     return graf
     
