@@ -45,7 +45,7 @@ def download_monuments(filename: str) -> None:
     
     sexy.close()
 
-def load_monuments(filename: str) -> Monuments:
+'''def load_monuments(filename: str) -> Monuments:
     """Load monuments from a file."""
     monuments: Monuments = []
     file = open(filename, "r")
@@ -53,7 +53,22 @@ def load_monuments(filename: str) -> Monuments:
         monument_name, lat, lon = line.strip().split(",")
         monuments.append(Monument(monument_name, Point(float(lat), float(lon))))  # type: ignore
     return monuments
-
+'''
+def load_monuments(filename: str) -> list[Monument]:
+    """Load monuments from a file."""
+    monuments = []
+    with open(filename, 'r') as file:
+        for line in file:
+            try:
+                parts = line.strip().split(",")
+                if len(parts) != 3:
+                    print(f"Skipping malformed line: {line}")
+                    continue
+                monument_name, lat, lon = parts
+                monuments.append(Monument(name=monument_name, location=Point(float(lat), float(lon))))
+            except ValueError as e:
+                print(f"Error processing line '{line}': {e}")
+    return monuments
 
 def get_monuments(filename: str) -> Monuments:
     """
@@ -70,4 +85,4 @@ def get_monuments(filename: str) -> Monuments:
 
 # COMPROVACIÓ
 
-print(download_monuments("filenamee.txt"))
+#download_monuments("filenamee.txt")
