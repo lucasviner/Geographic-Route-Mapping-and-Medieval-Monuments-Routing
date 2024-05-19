@@ -3,6 +3,7 @@ from sklearn.cluster import KMeans #type: ignore
 from segments import * #type: ignore 
 import numpy as np
 import matplotlib.pyplot as plt
+from math import acos, degrees
 
 
 def make_graph(segments: list[Segment], clusters: int) -> nx.Graph:
@@ -21,10 +22,12 @@ def make_graph(segments: list[Segment], clusters: int) -> nx.Graph:
     
     nodes_to_remove = [node for node in graf.nodes() if graf.degree[node] == 0]
     graf.remove_nodes_from(nodes_to_remove)
-
+    '''simplificat= simplify_graph(graf, 20)
+    return simplificat'''
     return graf
     
 def segments_a_numpy(segments: list[Segment]) -> np.array:
+    """Changes a list of segments to a numpy array of segments"""
     points:list[Point] = []
     for segment in segments:
         points.append(segment.start)
@@ -33,15 +36,6 @@ def segments_a_numpy(segments: list[Segment]) -> np.array:
     return points_array
 
 def arestes(etiquetas:list[int]) -> list[tuple[int,int]]: # llista de cluster de sortida i d'eentrada
-    """arestes_Centroides: list[tuple[int,int]] = []
-    matriu:list[list[int]]= [0 for]
-    for i in range(0,len(etiquetas),2):
-        if etiquetas[i] != etiquetas[i+1]:
-            e1,e2 = etiquetas[i], etiquetas[i+1]
-
-            if matriu[e1][e2] + matriu[e2][e1]> const:
-            arestes_Centroides.append([etiquetas[i],etiquetas[i+1]])
-    return arestes_Centroides"""
     arestes_Centroides: list[tuple[int, int]] = []
     
     # Encuentra el número máximo de clusters
@@ -65,8 +59,38 @@ def arestes(etiquetas:list[int]) -> list[tuple[int,int]]: # llista de cluster de
     return arestes_Centroides
 
         
-'''def simplify_graph(graph: nx.Graph, epsilon: float) -> nx.Graph:
-    """Simplify the graph."""'''
+def calculate_angle(p1, p2, p3):
+    """Calculate the angle between three points p1, p2, and p3 with p2 being the vertex."""
+    v1 = np.array([p1[0] - p2[0], p1[1] - p2[1]])
+    v2 = np.array([p3[0] - p2[0], p3[1] - p2[1]])
+    
+    cos_angle = np.dot(v1, v2) / (np.linalg.norm(v1) * np.linalg.norm(v2))
+    angle = degrees(acos(cos_angle))
+    
+    return angle
+
+def simplify_graph(graph: nx.Graph, epsilon: float) -> nx.Graph:
+    """Simplify the graph by removing nodes with exactly two edges if the angle between the edges is near 180 degrees."""
+    nodes_to_remove = []
+    
+    for node in list(graph.nodes):
+        neighbors = list(graph.neighbors(node))
+        if len(neighbors) == 2:
+            p1, p2, p3 = graph.nodes[neighbors[0]]['pos'], graph.nodes[node]['pos'], graph.nodes[neighbors[1]]['pos']
+            angle = calculate_angle(p1, p2, p3)
+            
+            if abs(angle - 180) < epsilon:
+                nodes_to_remove.append((node, neighbors[0], neighbors[1]))
+    
+    simplified_graph = graph.copy()
+    
+    for node, neighbor1, neighbor2 in nodes_to_remove:
+        if simplified_graph.has_node(node) and simplified_graph.has_node(neighbor1) and simplified_graph.has_node(neighbor2):
+            simplified_graph.add_edge(neighbor1, neighbor2)
+            simplified_graph.remove_node(node)
+    
+    return simplified_graph
+
 
 # COMPROVACIÓ 
 """
