@@ -17,14 +17,12 @@ Monuments: TypeAlias = list[Monument]
 
 def download_monuments(filename: str) -> None:
     """ Download monuments from Catalunya Medieval and it saves them to a file. """
-    
     url = "https://www.catalunyamedieval.es/comarques/"
     content = fetch_page_content(url)
     script_content = extract_script_tag(content, "var aCasaForta")
     
     if script_content:
-        monuments = parse_monument_data(script_content)
-        save_monuments_to_file(monuments, filename)
+        save_monuments_to_file(parse_monument_data(script_content), filename)
 
 
 def fetch_page_content(url: str) -> bytes:
@@ -42,6 +40,7 @@ def extract_script_tag(content: bytes, keyword: str) -> str:
         if keyword in script_tag.text:
             return script_tag.text
     return ""
+
 
 def parse_monument_data(script_content: str) -> list[Monument]:
     """ Parse monument data from the script content. """
@@ -72,8 +71,12 @@ def load_monuments(filename: str) -> Monuments:
     monuments: Monuments = []
     with open(filename, "r") as file:    
         for line in file:
-            monument_name, lat, lon = line.strip().split(",")
-            monuments.append(Monument(monument_name.strip(), Point(float(lat), float(lon))))
+            try:
+                monument_name, lat, lon = line.strip().split(",")
+                monuments.append(Monument(monument_name.strip(), Point(float(lat), float(lon))))
+            except ValueError as e:
+                print(f"Error processing line: {line.strip()} - {e}. This line will be ignored.")
+                continue
     return monuments
 
 
@@ -90,5 +93,6 @@ def get_monuments(filename: str) -> Monuments:
 
 
 # COMPROVACIÓ
-download_monuments("filenamee.txt")
-#print(load_monuments("filenamee.txt"))
+#if __name__ == "__main__":
+    #download_monuments("filenamee.txt")
+    #load_monuments("filenamee.txt")
