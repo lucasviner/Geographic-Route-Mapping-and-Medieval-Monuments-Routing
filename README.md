@@ -17,13 +17,10 @@ Passos per construir el mapa
 5) Associem els monuments als centroides més propers.
 
 Coses a fer:
-1) Acabar segments:
-  - cook data
-2) Monuments revisar
 3) Graphmaker
   - simplificar
   - modificacions arestes(jordi foto)
 4) Viewer revisar
 5) Routes fer
-Mirar si hi ha incongruencies en la funcio find_routes amb el que retorna
+  - incongruencies en la funcio find_routes amb el que retorna
 6) Main fer
