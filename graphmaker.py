@@ -22,9 +22,8 @@ def make_graph(segments: list[Segment], clusters: int) -> nx.Graph:
     
     nodes_to_remove = [node for node in graf.nodes() if graf.degree[node] == 0]
     graf.remove_nodes_from(nodes_to_remove)
-    '''simplificat= simplify_graph(graf, 20)
-    return simplificat'''
-    return graf
+    simplificat= simplify_graph(graf, 20)
+    return simplificat
     
 def segments_a_numpy(segments: list[Segment]) -> np.array:
     """Changes a list of segments to a numpy array of segments"""
