@@ -17,7 +17,6 @@ def create_graph(segments: list[Segment], num_clusters: int) -> nx.Graph:
 
     return simplified_graph
 
-
 def convert_segments_to_numpy(segments: list[Segment]) -> np.ndarray:
     """Convert a list of segments to a numpy array of points"""
     points: list[Point] = []
@@ -27,7 +26,6 @@ def convert_segments_to_numpy(segments: list[Segment]) -> np.ndarray:
     points_array = np.array([[point.lat, point.lon] for point in points])
 
     return points_array
-
 
 def build_graph(centroids: np.ndarray, labels: np.ndarray) -> nx.Graph:
     """Build a graph based on the centroids and their labels"""
@@ -44,28 +42,31 @@ def build_graph(centroids: np.ndarray, labels: np.ndarray) -> nx.Graph:
 
     return graph
 
-
 def create_edges(labels: np.ndarray) -> list[tuple[int, int]]:
-    """
-    Create edges based on the labels of the clusters"""
+    """Create edges based on the labels of the clusters"""
     centroid_edges: list[tuple[int, int]] = []
     max_cluster = max(labels) + 1
     adjacency_matrix: list[list[int]] = [[0 for _ in range(max_cluster)] for _ in range(max_cluster)]
+    adjacency_matrix = adjaceny_matrix(labels, adjacency_matrix)
+    edges = create_edges_matrix(adjacency_matrix, max_cluster, centroid_edges)
+    
+    return edges
 
-    # Fill the adjacency matrix with the connections between clusters
+def adjaceny_matrix(labels: np.ndarray, adjacency_matrix: list[list[int]])->list[list[int]]:
+    
     for i in range(0, len(labels), 2):
         if labels[i] != labels[i + 1]:
             cluster1, cluster2 = labels[i], labels[i + 1]
             adjacency_matrix[cluster1][cluster2] += 1
+    return adjacency_matrix
 
-    # Add edges if there are 2 or more paths between clusters
+def create_edges_matrix(adjacency_matrix: list[list[int]], max_cluster: int, centroid_edges: list[tuple[int, int]])->list[tuple[int,int]]:
     for cluster1 in range(max_cluster):
         for cluster2 in range(max_cluster):
             if adjacency_matrix[cluster1][cluster2] + adjacency_matrix[cluster2][cluster1] >= 2:
                 centroid_edges.append((cluster1, cluster2))
 
     return centroid_edges
-
 
 def simplify_graph(graph: nx.Graph, epsilon: float) -> nx.Graph:
     """Simplify the graph by removing nodes with exactly two edges 
@@ -80,7 +81,6 @@ def simplify_graph(graph: nx.Graph, epsilon: float) -> nx.Graph:
 
     return simplified_graph
 
-
 def find_nodes_to_remove(graph: nx.Graph, epsilon: float) -> list[tuple[int, int, int]]:
     """Returns the list of nodes which should be simplified"""
     nodes = []
@@ -92,7 +92,6 @@ def find_nodes_to_remove(graph: nx.Graph, epsilon: float) -> list[tuple[int, int
             if abs(angle - 180) < epsilon:
                 nodes.append((node, neighbors[0], neighbors[1]))
     return nodes
-
 
 def calculate_angle(p1: list[float], p2: list[float], p3: list[float]) -> float:
     """Calculate the angle between three points p1, p2, and p3 with p2 being the vertex"""
