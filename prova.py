@@ -1,73 +1,118 @@
-from dataclasses import dataclass
 from typing import TypeAlias
-from bs4 import BeautifulSoup
-import requests
-from segments import Point
-import re
+from dataclasses import dataclass
+import requests, gpxpy
+from staticmap import StaticMap, Line
+from datetime import datetime
+import haversine, os
 
 
 @dataclass
-class Monument:
-    name: str
-    location: Point
+class Point:
+    lat: float
+    lon: float
 
 
-Monuments: TypeAlias = list[Monument]
+@dataclass
+class Segment:
+    start: Point
+    end: Point
 
 
-def download_monuments(filename: str) -> None:
-    """Download monuments from Catalunya Medieval and it saves them to a file"""
-    sexy = open(filename, "w")
-    url = "https://www.catalunyamedieval.es/comarques/"
-    response = requests.get(url, timeout=20)
-    soup = BeautifulSoup(response.content, "html.parser")
-    script_tags = soup.find_all("script")
-
-    script_target = None
-    for script_tag in script_tags:
-        if "var aCasaForta" in script_tag.text:
-            script_target = script_tag
-            break
-
-    if script_target:
-        script_content = script_target.text
-        title_pattern = r'"title":"(.*?)"'
-        position_pattern = r'"position":{"lat":"(.*?)","long":"(.*?)"}'
-                    
-        titles = re.findall(title_pattern, script_content)            
-        locations = re.findall(position_pattern, script_content)
-
-        i = 0
-        for location in locations:
-            title = bytes(titles[i], "utf-8").decode("unicode_escape")
-            sexy.write(f"{title},{float(location[0])},{float(location[1])}\n")
-            i += 1
-    
-    sexy.close()
-
-def load_monuments(filename: str) -> Monuments:
-    """Load monuments from a file."""
-    monuments: Monuments = []
-    file = open(filename, "r")
-    for line in file:
-        monument_name, lat, lon = line.strip().split(",")
-        monuments.append(Monument(monument_name, Point(float(lat), float(lon))))  # type: ignore
-    return monuments
+@dataclass
+class Box:
+    bottom_left: Point
+    top_right: Point
 
 
-def get_monuments(filename: str) -> Monuments:
+Segments: TypeAlias = list[Segment]
+
+
+def download_segments(box: Box, filename: str) -> None:
+    """Download all segments in the box and save them to the file."""
+    page = 0
+    with open(filename, 'w') as f:
+        while True:
+            url = f"https://api.openstreetmap.org/api/0.6/trackpoints?bbox={box.bottom_left.lon},{box.bottom_left.lat},{box.top_right.lon},{box.top_right.lat}&page={page}"
+            gpx_content = fetch_gpx_content(url)
+            gpx_parsed = gpxpy.parse(gpx_content)
+            
+            if len(gpx_parsed.tracks) == 0:
+                break
+            
+            for track in gpx_parsed.tracks:
+                for segment in track.segments:
+                    if all(point.time is not None for point in segment.points):
+                        segment.points.sort(key=lambda p: p.time)  # type: ignore
+                        for i in range(len(segment.points) - 1):
+                            p1, p2 = segment.points[i], segment.points[i + 1]
+                            if is_valid_data(p1, p2):
+                                f.write( f"{p1.latitude},{p1.longitude},{p2.latitude},{p2.longitude}\n")
+            page += 1
+
+
+def fetch_gpx_content(url: str) -> str:
+    """Fetch GPX data from the OpenStreetMap API for a given bounding box and page number."""
+    response = requests.get(url)
+    return response.content.decode("utf-8")
+
+
+def is_valid_data(p1: gpxpy.gpx.GPXTrackPoint, p2: gpxpy.gpx.GPXTrackPoint) -> bool:
     """
-    Get all monuments in the box.
-    If filename exists, load monuments from the file.
-    Otherwise, download monuments and save them to the file.
+    Returns a boolean indicating whether the processed data is valid according to the specified criteria.
+    Any anomalies detected in the data will be ignored.
     """
-    try:
-        monuments = load_monuments(filename)
-    except FileNotFoundError:
-        monuments = download_monuments(filename)
-    return monuments
+    t_point1 = datetime.strptime(str(p1.time), "%Y-%m-%d %H:%M:%S%z")
+    t_point2 = datetime.strptime(str(p2.time), "%Y-%m-%d %H:%M:%S%z")
+
+    if t_point1.year < 2005 or t_point2.year < 2005:
+        return False
+
+    distance = haversine.haversine((p1.latitude, p1.longitude),(p2.latitude, p2.longitude), 'm')
+    return distance >= 100
 
 
-# COMPROVACIÓ
+def load_segments(filename: str) -> Segments:
+    """Load segments from the file."""
+    segments: Segments = []
+    with open(filename, "r") as file:
+        for line in file:
+            bottom_left_lon, bottom_left_lat, top_right_lon, top_right_lat = map(float, line.strip().split(","))
+            start_point = Point(bottom_left_lat, bottom_left_lon)
+            end_point = Point(top_right_lat, top_right_lon)
+            segment = Segment(start_point, end_point)
+            segments.append(segment)
+    return segments
 
-download_monuments("filenamee.txt")
+
+def get_segments(box: Box, filename: str) -> Segments:
+    """
+    Get all segments in the box.
+    If filename exists, load segments from the file.
+    Otherwise, download segments in the box and save them to the file.
+    """
+    if os.path.exists(filename):
+        return load_segments(filename)
+    download_segments(box, filename)
+    return load_segments(filename)
+
+
+def show_segments(segments: Segments, filename: str) -> None:
+    """Show all segments in a PNG file using staticmaps."""
+    static_map = StaticMap(800, 600)
+
+    for segment in segments:
+        start_point = segment.start
+        end_point = segment.end
+        line = Line(((start_point.lon, start_point.lat), (end_point.lon, end_point.lat)),"blue",2,)
+        static_map.add_line(line)
+
+    image = static_map.render()
+    image.save(filename)
+
+
+# COMPROVAR QUE FUNCIONEN
+
+# print(load_segments("filename.txt"))
+# print(get_segments(Box(Point(40.5363713, 0.5739316671), Point(40.79886535, 0.9021482)), "filenamee.txt"))
+# show_segments(get_segments(Box(Point(40.5363713, 0.5739316671), Point(40.79886535, 0.9021482)), "filename.txt"),"foto.png")
+download_segments(Box(Point(40.5363713, 0.5739316671), Point(40.79886535, 0.9021482)),"filenameee.txt")
