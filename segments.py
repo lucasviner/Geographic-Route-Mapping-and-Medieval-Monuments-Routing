@@ -30,36 +30,27 @@ Segments: TypeAlias = list[Segment]
 def download_segments(box: Box, filename: str) -> None:
     """Download all segments in the box and save them to the file."""
     page = 0
-    while True:
-        url = f"https://api.openstreetmap.org/api/0.6/trackpoints?bbox={box.bottom_left.lon},{box.bottom_left.lat},{box.top_right.lon},{box.top_right.lat}&page={page}"
-        gpx = fetch_gpx_content(url)
-        if not gpx:
-            break
-        gpx_parsed = gpxpy.parse(gpx)
-        if len(gpx_parsed.tracks) == 0:
-            break
-        save_segments_from_gpx(gpx_parsed, filename)
-        page += 1
-
-
-def fetch_gpx_content(url: str) -> str:
-    """Fetch GPX data from the OpenStreetMap API for a given bounding box and page number."""
-    response = requests.get(url)
-    return response.content.decode("utf-8")
-
-
-def save_segments_from_gpx(gpx_parsed: gpxpy.gpx.GPX, filename: str) -> None:
-    """Extracts the segments from the gpx content and saves the valids ones to the filename."""
-    with open(filename, "a") as f:
-        for track in gpx_parsed.tracks:
-            for segment in track.segments:
-                if all(point.time is not None for point in segment.points):
-                    segment.points.sort(key=lambda p: p.time)  # type: ignore
-                    for i in range(len(segment.points) - 1):
-                        p1, p2 = segment.points[i], segment.points[i + 1]
-                        if is_valid_data(p1, p2):
-                            f.write(f"{p1.latitude},{p1.longitude},{p2.latitude},{p2.longitude}\n")
-
+    with open(filename, "w") as f:
+        while True:
+            boxx = f"{box.bottom_left.lon},{box.bottom_left.lat},{box.top_right.lon},{box.top_right.lat}"
+            url = f"https://api.openstreetmap.org/api/0.6/trackpoints?bbox={boxx}&page={page}"
+            response = requests.get(url)
+            gpx_content = response.content.decode("utf-8")
+            gpx = gpxpy.parse(gpx_content)
+                            
+            print(f"Page {page}: Found {len(gpx.tracks)} tracks")
+            if len(gpx.tracks) == 0:
+                break
+            
+            for track in gpx.tracks:
+                for segment in track.segments:
+                    if all(point.time is not None for point in segment.points):
+                        segment.points.sort(key=lambda p: p.time)  # type: ignore
+                        for i in range(len(segment.points) - 1):
+                            p1, p2 = segment.points[i], segment.points[i + 1]
+                            if is_valid_data(p1, p2):
+                                f.write(f"{p1.latitude},{p1.longitude},{p2.latitude},{p2.longitude}\n")
+            page += 1
 
 def is_valid_data(p1: gpxpy.gpx.GPXTrackPoint, p2: gpxpy.gpx.GPXTrackPoint) -> bool:
     """
@@ -72,8 +63,8 @@ def is_valid_data(p1: gpxpy.gpx.GPXTrackPoint, p2: gpxpy.gpx.GPXTrackPoint) -> b
     if t_point1.year < 2005 or t_point2.year < 2005:
         return False
 
-    distance = haversine.haversine((p1.latitude, p1.longitude), (p2.latitude, p2.longitude), unit="m")
-    return distance >= 100
+    distance = haversine.haversine((p1.latitude, p1.longitude), (p2.latitude, p2.longitude))
+    return distance <= 0.1
 
 
 def load_segments(filename: str) -> Segments:
@@ -95,9 +86,8 @@ def get_segments(box: Box, filename: str) -> Segments:
     If filename exists, load segments from the file.
     Otherwise, download segments in the box and save them to the file.
     """
-    if os.path.exists(filename):
-        return load_segments(filename)
-    download_segments(box, filename)
+    if not os.path.exists(filename):
+        download_segments(box, filename)
     return load_segments(filename)
 
 
@@ -120,4 +110,4 @@ def show_segments(segments: Segments, filename: str) -> None:
 # print(load_segments("filename.txt"))
 # print(get_segments(Box(Point(40.5363713, 0.5739316671), Point(40.79886535, 0.9021482)), "filenamee.txt"))
 # show_segments(get_segments(Box(Point(40.5363713, 0.5739316671), Point(40.79886535, 0.9021482)), "filename.txt"),"foto.png")
-# download_segments(Box(Point(40.5363713, 0.5739316671), Point(40.79886535, 0.9021482)),"filenameee.txt")
+download_segments(Box(Point(40.5363713, 0.5739316671), Point(40.79886535, 0.9021482)), "filenamee.txt")
