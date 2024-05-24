@@ -1,9 +1,9 @@
 from dataclasses import dataclass
 from typing import TypeAlias
 from bs4 import BeautifulSoup
-import requests, os
 from segments import Point, Box
 from re import findall
+import requests, os
 
 
 @dataclass
@@ -66,7 +66,7 @@ def save_monuments_to_file(monuments: list[Monument], filename: str) -> None:
 
 
 def load_monuments(box: Box, filename: str) -> Monuments:
-    """Load monuments from a file."""
+    """Load monuments from a file and filter by location within the given box."""
     monuments: Monuments = []
     with open(filename, "r") as file:    
         for line in file:
@@ -74,27 +74,27 @@ def load_monuments(box: Box, filename: str) -> Monuments:
                 monument_name, lat, lon = get_data_from_file(line)                
                 if monument_in_box(box, lat, lon): 
                     monuments.append(Monument(monument_name, Point(lat, lon)))
-            except Exception as e:
+            except ValueError as e:
                 print(f"Error processing line: {line.strip()} - {e}. This line will be ignored.")
     return monuments
 
 
 def get_data_from_file(line: str) -> tuple[str, float, float]:
-    """ Gets the monument name and the coordenates from the file """
+    """Extract the monument name and coordinates from a line in the file."""
     name_and_coords = line.strip().split(" - ")
     monument_name = name_and_coords[0]
-    lat, lon = name_and_coords[1].split(",")
-    return monument_name, float(lat), float(lon)
+    lat, lon = map(float, name_and_coords[1].split(","))
+    return monument_name, lat, lon
                  
 
 def monument_in_box(box: Box, lat: float, lon: float) -> bool:
-    """ Returns if the monument is inside the interested box. """
+    """Check if the monument is inside the specified box."""
     return box.bottom_left.lat <= lat <= box.top_right.lat and box.bottom_left.lon <= lon <= box.top_right.lon
+
 
 def get_monuments(box: Box, filename: str) -> Monuments:
     """
-    Get all monuments in the box.
-    If filename exists, load monuments from the file.
+    Get all monuments in the box. If filename exists, load monuments from the file.
     Otherwise, download monuments and save them to the file.
     """
     if not os.path.exists(filename):
