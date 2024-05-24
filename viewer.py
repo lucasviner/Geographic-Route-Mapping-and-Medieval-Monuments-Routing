@@ -1,4 +1,4 @@
-from graphmaker import make_graph
+from graphmaker import create_graph
 from segments import load_segments
 from staticmap import StaticMap, CircleMarker, Line 
 import networkx as nx 
@@ -32,6 +32,7 @@ def nodes_PNG(graph: nx.Graph, static_map: StaticMap)->None:
 
 def export_KML(graph: nx.Graph, filename: str) -> None:
     """Export the graph to a KML file."""
+    #kml,namesoace,document = funcio x
     kml = KML()
     namespace = '{http://www.opengis.net/kml/2.2}'
     document = Document(namespace, 'docid', 'Graph', 'Graph KML')
@@ -66,7 +67,7 @@ def open_file(filename: str, kml: KML)->None:
             fitxer.write(kml.to_string())
 
 # COMPROVACIÓ
-segments = load_segments('filename.txt')
-graph = make_graph(segments, 100)
+segments = load_segments('filenameee.txt')
+graph = create_graph(segments, 100)
 export_PNG(graph, 'graph.png')
 export_KML(graph, 'graph.kml')

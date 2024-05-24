@@ -35,25 +35,26 @@ def build_graph(centroids: np.ndarray, labels: np.ndarray) -> nx.Graph:
     
     edges = create_edges(labels)
     graph.add_edges_from(edges)
+    remove_nodes_no_edges(graph)
     
-    # Remove nodes with no edges
+    return graph
+
+def remove_nodes_no_edges(graph: nx.Graph)->None:
+
     nodes_to_remove = [node for node in graph.nodes() if graph.degree[node] == 0]
     graph.remove_nodes_from(nodes_to_remove)
-
-    return graph
 
 def create_edges(labels: np.ndarray) -> list[tuple[int, int]]:
     """Create edges based on the labels of the clusters"""
     centroid_edges: list[tuple[int, int]] = []
     max_cluster = max(labels) + 1
-    adjacency_matrix: list[list[int]] = [[0 for _ in range(max_cluster)] for _ in range(max_cluster)]
-    adjacency_matrix = adjaceny_matrix(labels, adjacency_matrix)
+    adjacency_matrix = create_adjaceny_matrix(labels, max_cluster)
     edges = create_edges_matrix(adjacency_matrix, max_cluster, centroid_edges)
     
     return edges
 
-def adjaceny_matrix(labels: np.ndarray, adjacency_matrix: list[list[int]])->list[list[int]]:
-    
+def create_adjaceny_matrix(labels: np.ndarray, max_cluster:int)->list[list[int]]:
+    adjacency_matrix: list[list[int]] = [[0 for _ in range(max_cluster)] for _ in range(max_cluster)]
     for i in range(0, len(labels), 2):
         if labels[i] != labels[i + 1]:
             cluster1, cluster2 = labels[i], labels[i + 1]
@@ -72,15 +73,19 @@ def simplify_graph(graph: nx.Graph, epsilon: float) -> nx.Graph:
     """Simplify the graph by removing nodes with exactly two edges 
     if the angle between the edges is near 180 degrees"""
     nodes_to_remove = find_nodes_to_remove(graph, epsilon)
-    simplified_graph = graph.copy()
+    node_remover(graph, nodes_to_remove)
 
+    return graph 
+
+def node_remover(graph: nx.Graph, nodes_to_remove: list[tuple[int, int, int]])->None:
     for node, neighbor1, neighbor2 in nodes_to_remove:
-        if simplified_graph.has_node(node) and simplified_graph.has_node(neighbor1) and simplified_graph.has_node(neighbor2):
-            simplified_graph.add_edge(neighbor1, neighbor2)
-            simplified_graph.remove_node(node)
-
-    return simplified_graph
-
+        if graph.has_node(node) and graph.has_node(neighbor1) and graph.has_node(neighbor2):
+            # Add edge between the two neighbors if not already present
+            if not graph.has_edge(neighbor1, neighbor2):
+                graph.add_edge(neighbor1, neighbor2)
+            # Remove the node and its edges
+            graph.remove_node(node)
+            
 def find_nodes_to_remove(graph: nx.Graph, epsilon: float) -> list[tuple[int, int, int]]:
     """Returns the list of nodes which should be simplified"""
     nodes = []
@@ -103,7 +108,6 @@ def calculate_angle(p1: list[float], p2: list[float], p3: list[float]) -> float:
     angle = degrees(acos(cos_angle))
 
     return angle
-
 
 # Example usage
 '''
