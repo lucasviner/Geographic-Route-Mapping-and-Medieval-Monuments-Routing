@@ -32,16 +32,15 @@ def download_segments(box: Box, filename: str) -> None:
     page = 0
     with open(filename, "w") as f:
         while True:
-            boxx = f"{box.bottom_left.lon},{box.bottom_left.lat},{box.top_right.lon},{box.top_right.lat}"
-            url = f"https://api.openstreetmap.org/api/0.6/trackpoints?bbox={boxx}&page={page}"
+            BOXX = f"{box.bottom_left.lon},{box.bottom_left.lat},{box.top_right.lon},{box.top_right.lat}"
+            url = f"https://api.openstreetmap.org/api/0.6/trackpoints?bbox={BOXX}&page={page}"
             response = requests.get(url)
             gpx_content = response.content.decode("utf-8")
             gpx = gpxpy.parse(gpx_content)
                             
-            print(f"Page {page}: Found {len(gpx.tracks)} tracks")
             if len(gpx.tracks) == 0:
                 break
-            
+
             for track in gpx.tracks:
                 for segment in track.segments:
                     if all(point.time is not None for point in segment.points):
@@ -52,6 +51,7 @@ def download_segments(box: Box, filename: str) -> None:
                                 f.write(f"{p1.latitude},{p1.longitude},{p2.latitude},{p2.longitude}\n")
             page += 1
 
+
 def is_valid_data(p1: gpxpy.gpx.GPXTrackPoint, p2: gpxpy.gpx.GPXTrackPoint) -> bool:
     """
     Returns a boolean indicating whether the processed data is valid according to the specified criteria.
@@ -60,7 +60,7 @@ def is_valid_data(p1: gpxpy.gpx.GPXTrackPoint, p2: gpxpy.gpx.GPXTrackPoint) -> b
     t_point1 = datetime.strptime(str(p1.time), "%Y-%m-%d %H:%M:%S%z")
     t_point2 = datetime.strptime(str(p2.time), "%Y-%m-%d %H:%M:%S%z")
 
-    if t_point1.year < 2005 or t_point2.year < 2005:
+    if t_point1.year < 2015 or t_point2.year < 2015:
         return False
 
     distance = haversine.haversine((p1.latitude, p1.longitude), (p2.latitude, p2.longitude))
@@ -108,6 +108,7 @@ def show_segments(segments: Segments, filename: str) -> None:
 # COMPROVAR QUE FUNCIONEN
 
 # print(load_segments("filename.txt"))
-# print(get_segments(Box(Point(40.5363713, 0.5739316671), Point(40.79886535, 0.9021482)), "filenamee.txt"))
-# show_segments(get_segments(Box(Point(40.5363713, 0.5739316671), Point(40.79886535, 0.9021482)), "filename.txt"),"foto.png")
-download_segments(Box(Point(40.5363713, 0.5739316671), Point(40.79886535, 0.9021482)), "filenamee.txt")
+# print(get_segments(Box(Point(40.5363713, 0.5739316671), Point(40.79886535, 0.9021482)), "segments.dat"))
+# show_segments(get_segments(Box(Point(40.5363713, 0.5739316671), Point(40.79886535, 0.9021482)), "segments.dat"),"foto.png")
+download_segments(Box(Point(40.5363713, 0.5739316671), Point(40.79886535, 0.9021482)), "segments.dat")
+#download_segments(Box(Point(40.5363713, 0.8139316671), Point(40.79886535, 0.90211422)), "segments.dat")
