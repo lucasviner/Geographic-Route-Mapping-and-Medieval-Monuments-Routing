@@ -1,99 +1,67 @@
-from typing import TypeAlias
-from dataclasses import dataclass
 import networkx as nx
-from segments import Point, load_segments
-from monuments import Monument, load_monuments
-from staticmap import StaticMap, Line
-import simplekml
-from graphmaker import *
-@dataclass
-class Routes:
-    path: list[Point]
+from segments import Point
+from monuments import Monument
+from staticmap import StaticMap, CircleMarker, Line
+import simplekml 
+from viewer import graph
+from monuments import load_monuments
+from segments import Box
+from scipy.spatial.distance import euclidean
 
-paths: TypeAlias = list[list[Point]]
 
-def find_closest_node(graph: nx.Graph, point: Point) -> int:
-    """Find the closest node in the graph to the given point."""
-    closest_node = None
-    min_distance = float('inf')
-    
-    for node, data in graph.nodes(data=True):
-        node_pos = data['pos']
-        distance = ((node_pos[0] - point.lat) ** 2 + (node_pos[1] - point.lon) ** 2) ** 0.5  # Euclidean distance
-        if distance < min_distance:
-            min_distance = distance
-            closest_node = node
-    
-    return closest_node
-def find_routes(graph: nx.Graph, start: Point, endpoints: list[Monument]) -> Routes:
-    """Find the shortest route between the starting point and all the endpoints."""
-    routes = []
-    start_node = find_closest_node(graph, start)
+def find_routes(graph: nx.Graph, start: Point, endpoints: list[Monument]) -> nx.Graph:
+    # Create a new graph for the shortest routes
+    shortest_routes_graph = nx.Graph()
 
-    for endpoint in endpoints:
-        try:
-            end_node = find_closest_node(graph, endpoint.location)
-            route_node_ids = nx.shortest_path(graph, source=start_node, target=end_node)
-            route_points = [Point(*graph.nodes[node]['pos']) for node in route_node_ids]
-            routes.append(route_points)
-        except nx.NetworkXNoPath:
-            print(f"No path found from {start} to {endpoint.location}.")
-        except nx.NodeNotFound as e:
-            print(f"Node not found error: {e}")
-    
-    return Routes(path=routes)
+    # Associate start point and endpoints with the closest nodes in the original graph
+    closest_nodes = {}
+    remaining_nodes = set(graph.nodes)
+    for location in [start] + [monument.location for monument in endpoints]:
+        closest_node = min(remaining_nodes, key=lambda node: euclidean(graph.nodes[node]['pos'], (location.lat, location.lon)))
+        closest_nodes[(location.lat, location.lon)] = closest_node
+        remaining_nodes.remove(closest_node)
 
-def export_PNG(routes: Routes, filename: str) -> None:
-    """Export the graph to a PNG file using staticmaps."""
+    # Add nodes to the new graph
+    for node in closest_nodes.values():
+        shortest_routes_graph.add_node(node, pos=(graph.nodes[node]['pos'][0], graph.nodes[node]['pos'][1]))
+
+    # Find the shortest paths between the start node and each endpoint node
+    for monument in endpoints:
+        shortest_path = nx.shortest_path(graph, source=closest_nodes[(start.lat, start.lon)], target=closest_nodes[(monument.location.lat, monument.location.lon)])
+        for i in range(len(shortest_path) - 1):
+            shortest_routes_graph.add_edge(shortest_path[i], shortest_path[i + 1])
+    print(closest_nodes)
+    return shortest_routes_graph
+
+
+def export_PNG(graph: nx.Graph, filename: str) -> None:
+    """Export the graph to a PNG file using staticmap."""
     static_map = StaticMap(800, 600)
-
-    if not routes.path:
-        print("No routes to export to PNG.")
-        return
-    
-    for path in routes.path:
-        for i in range(len(path) - 1):
-            start_point = path[i]
-            end_point = path[i + 1]
-            line = Line([(start_point.lon, start_point.lat), (end_point.lon, end_point.lat)], 'blue', 2)
-            static_map.add_line(line)
-
+    arestes_PNG(graph, static_map)
+    nodes_PNG(graph, static_map)
     image = static_map.render()
     image.save(filename)
 
-def export_KML(routes: Routes, filename: str) -> None:
-    """Export the graph to a KML file."""
-    kml = simplekml.Kml()
-    if not routes.path:
-        print("No routes to export to KML.")
-        return
-    
-    for path in routes.path:
-        coords = [(point.lon, point.lat) for point in path]
-        line = kml.newlinestring(name="Route", coords=coords)
-        line.style.linestyle.color = simplekml.Color.blue
-        line.style.linestyle.width = 4
 
-    kml.save(filename)
+def arestes_PNG(graph: nx.Graph, static_map: StaticMap)-> None:
+    """Adds the edges of a graph to a StaticMap as Lines"""
+    for edge in graph.edges():
+        start_lat = graph.nodes[edge[0]]["pos"][0]
+        start_lon = graph.nodes[edge[0]]["pos"][1]
+        end_lat = graph.nodes[edge[1]]["pos"][0]
+        end_lon = graph.nodes[edge[1]]["pos"][1]
+        line = Line([(start_lat, start_lon), (end_lat,end_lon)], "blue", 2)
+        static_map.add_line(line)
 
-# Verificación de segmentos
-segments = load_segments('filename.txt')
-#print("Loaded segments:", segments)
 
-# Crear el grafo
-G = make_graph(segments, 90)
-#print("Graph nodes:", G.nodes)
+def nodes_PNG(graph: nx.Graph, static_map: StaticMap)->None:
+    """Adds the nodes of a graph to a StaticMap as CircleMarkers"""
+    for node in graph.nodes():
+        pos = graph.nodes[node]["pos"]
+        Marker = CircleMarker(pos, "red", 6)
+        static_map.add_marker(Marker)
 
-# Definir el punto de inicio y cargar monumentos
-start = Point(41.7215, 1.8296944444444445)
-monuments = load_monuments('filenamee.txt')
-#print("Loaded monuments:", monuments)
+start_point = Point(lat=40.55, lon=0.6739316671)
+grafo = find_routes(graph, start_point, load_monuments(Box(Point(40.5363713, 0.5739316671), Point(40.79886535, 0.9021482)),'monuments.dat'))
+export_PNG(grafo, 'graf.png')
 
-# Encontrar rutas
-routes = find_routes(G, start, monuments)
-
-# Exportar las rutas a PNG y KML
-export_PNG(routes, 'graf.png')
-export_KML(routes, 'graf.kml')
-
-print("Routes:", routes)
