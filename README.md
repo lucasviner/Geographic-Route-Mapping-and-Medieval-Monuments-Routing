@@ -1,8 +1,8 @@
-# Project Title
+# Pràctica GCED-AP2 2024 · Rutes i monuments
 
 Geographic Route Mapping and Medieval Monuments Routing
 
-## One Paragraph of project description goes here
+## Project Description
 
 This project allows users to process geographic data, obtain hiking routes within a specified region, infer a map (graph) based on these routes, and find optimal paths to medieval monuments within the region. The results can be visualized in both 2D and 3D formats. Users can export the generated maps in .png and .kml formats and interactively find optimal routes to various points of interest.
 
