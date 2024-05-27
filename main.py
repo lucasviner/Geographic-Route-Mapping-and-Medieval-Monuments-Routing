@@ -1,8 +1,9 @@
 from yogi import read
-from graphmaker import make_graph
+from graphmaker import make_graph, Graph
 from viewer import export_png, export_kml
-from segments import Box, Point, get_segments
-from monuments import download_monuments, load_monuments
+from segments import Box, Point, Segments, get_segments
+from monuments import download_monuments, load_monuments, Monuments
+from routes import find_routes
 import networkx as nx
 
 
@@ -31,9 +32,9 @@ def main():
     print("Now, we will download the monuments data from Medieval Catalunya. Please wait...")
     download_monuments('monuments.dat')
     print("Download complete! You can now find optimal routes to nearby monuments within the region.")
-    
+    monuments_of_the_box = load_monuments(box, 'monuments.dat')
     while True:
-        find_optimal_routes()
+        find_optimal_routes(monuments_of_the_box, graph)
 
 
 def get_user_input_box() -> Box:
@@ -45,12 +46,12 @@ def get_user_input_box() -> Box:
     return Box(Point(bottom_left_lat, bottom_left_lon), Point(top_right_lat, top_right_lon))
 
 
-def get_segments_in_box(box: Box) -> list:
+def get_segments_in_box(box: Box) -> Segments:
     """Get the segments within the specified box."""
     return get_segments(box, "segments.dat")
 
 
-def create_graph(segments: list) -> nx.Graph:
+def create_graph(segments: Segments) -> Graph:
     """Create a graph from the given segments."""
     return make_graph(segments, num_clusters=100)
 
@@ -65,7 +66,7 @@ def get_export_option() -> int:
     return read(int)
 
 
-def export_graph(graph: nx.Graph, export_option: int) -> None:
+def export_graph(graph: Graph, export_option: int) -> None:
     """Export the graph routes based on the chosen export option."""
     if export_option == 1:
         export_png(graph, "graph.png")
@@ -81,17 +82,15 @@ def export_graph(graph: nx.Graph, export_option: int) -> None:
         print("No export selected.")
 
 
-def find_optimal_routes() -> None:
+def find_optimal_routes(monuments: Monuments, graph: Graph) -> None:
     """Prompt the user to input an initial point and find optimal routes to nearby monuments within the region."""
     print("Enter an initial point to find optimal routes to all nearby monuments within the region:")
     lat = float(input("Latitude: "))
     lon = float(input("Longitude: "))
     point = Point(lat, lon)
-    box = get_user_input_box()
-    monuments = load_monuments(box, 'monuments.dat')
-    # Here you would calculate the routes and display the maps
     print(f"Calculating optimal routes from ({lat}, {lon}) to nearby monuments...")
-    # routes(point)
+    optimal_routes = find_routes(graph, point, monuments)
+    print(optimal_routes)
 
 
 if __name__ == "__main__":

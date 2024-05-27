@@ -41,7 +41,7 @@ def extract_script_tag(content: bytes, keyword: str) -> str:
     return ""
 
 
-def parse_monument_data(script_content: str) -> list[Monument]:
+def parse_monument_data(script_content: str) -> Monuments:
     """ Parse monument data from the script content. """
     title_pattern = r'"title":"(.*?)"'
     position_pattern = r'"position":{"lat":"(.*?)","long":"(.*?)"}'
@@ -49,7 +49,7 @@ def parse_monument_data(script_content: str) -> list[Monument]:
     titles = findall(title_pattern, script_content)
     locations = findall(position_pattern, script_content)
     
-    monuments = []
+    monuments: Monuments = []
     for i, location in enumerate(locations):
         title = bytes(titles[i], "utf-8").decode("unicode_escape")
         lat, lon = map(float, location)
@@ -58,7 +58,7 @@ def parse_monument_data(script_content: str) -> list[Monument]:
     return monuments
 
 
-def save_monuments_to_file(monuments: list[Monument], filename: str) -> None:
+def save_monuments_to_file(monuments: Monuments, filename: str) -> None:
     """Save a list of monuments to a file."""
     with open(filename, 'w') as f:
         for monument in monuments:

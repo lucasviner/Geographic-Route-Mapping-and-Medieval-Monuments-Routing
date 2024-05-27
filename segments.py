@@ -24,6 +24,7 @@ class Box:
 
 
 Segments: TypeAlias = list[Segment]
+point: TypeAlias = gpxpy.gpx.GPXTrackPoint
 
 
 def download_segments(box: Box, filename: str) -> None:
@@ -46,7 +47,7 @@ def download_segments(box: Box, filename: str) -> None:
                         segment.points.sort(key=lambda p: p.time)  # type: ignore
                         for i in range(len(segment.points) - 1):
                             p1, p2 = segment.points[i], segment.points[i + 1]
-                            if is_valid_data(p1, p2):
+                            if is_valid(p1, p2):
                                 f.write(f"{p1.latitude},{p1.longitude},{p2.latitude},{p2.longitude}\n")
             page += 1
 
@@ -57,7 +58,7 @@ def fetch_gpx_content(url: str) -> str:
     return response.content.decode("utf-8")
 
 
-def is_valid_data(p1: gpxpy.gpx.GPXTrackPoint, p2: gpxpy.gpx.GPXTrackPoint) -> bool:
+def is_valid(p1: point, p2: point) -> bool:
     """Check if the data between two points is valid according to the specified criteria."""
     limit_year = 2015
     t_point1 = datetime.strptime(str(p1.time), "%Y-%m-%d %H:%M:%S%z")
@@ -83,7 +84,7 @@ def load_segments(filename: str) -> Segments:
     return segments
 
 
-def get_data_from_file(line:str) -> Segment:
+def get_data_from_file(line: str) -> Segment:
     """ Convert a line of text into a Segment object. """
     bottom_left_lon, bottom_left_lat, top_right_lon, top_right_lat = map(float, line.strip().split(","))
     start_point = Point(bottom_left_lat, bottom_left_lon)
@@ -107,7 +108,7 @@ def show_segments(segments: Segments, filename: str) -> None:
 
     for segment in segments:
         start_point, end_point = segment.start, segment.end
-        line = Line(((start_point.lon, start_point.lat), (end_point.lon, end_point.lat)),"blue", 2)
+        line = Line(((start_point.lat, start_point.lon), (end_point.lat, end_point.lon)), "black", 2)
         static_map.add_line(line)
 
     image = static_map.render()
@@ -118,6 +119,6 @@ def show_segments(segments: Segments, filename: str) -> None:
 
 # print(load_segments("filename.txt"))
 # print(get_segments(Box(Point(40.5363713, 0.5739316671), Point(40.79886535, 0.9021482)), "segments.dat"))
-# show_segments(get_segments(Box(Point(40.5363713, 0.5739316671), Point(40.79886535, 0.9021482)), "segments.dat"),"foto.png")
+#show_segments(get_segments(Box(Point(40.5363713, 0.5739316671), Point(40.79886535, 0.9021482)), "segments.dat"),"foto.png")
 #download_segments(Box(Point(40.5363713, 0.5739316671), Point(40.79886535, 0.9021482)), "segments.dat")
 #download_segments(Box(Point(40.5363713, 0.8139316671), Point(40.79886535, 0.90211422)), "segments.dat")

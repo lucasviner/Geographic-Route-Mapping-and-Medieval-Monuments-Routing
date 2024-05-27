@@ -1,11 +1,21 @@
 import networkx as nx
 from sklearn.cluster import KMeans
-from segments import Segment, Point
+from segments import Segment, Point, load_segments, Segments
 import numpy as np
 from math import acos, degrees
+from typing import TypeAlias
 
 
-def make_graph(segments: list[Segment], num_clusters: int) -> nx.Graph:
+Graph: TypeAlias = nx.Graph
+Matrix: TypeAlias = list[list[int]]
+Nodes: TypeAlias = list[tuple[int, int, int]]
+Array: TypeAlias = np.ndarray
+Edges: TypeAlias = list[tuple[int, int]]
+Points: TypeAlias = list[Point]
+
+
+
+def make_graph(segments: Segments, num_clusters: int) -> Graph:
     """Create and simplify a graph from the segments"""
     points = convert_segments_to_numpy(segments)
     centroids, labels = perform_kmeans_clustering(points, num_clusters)
@@ -15,9 +25,9 @@ def make_graph(segments: list[Segment], num_clusters: int) -> nx.Graph:
     return simplified_graph
 
 
-def convert_segments_to_numpy(segments: list[Segment]) -> np.ndarray:
+def convert_segments_to_numpy(segments: Segments) -> Array:
     """Convert a list of segments to a numpy array of points"""
-    points: list[Point] = []
+    points: Points = []
     for segment in segments:
         points.append(segment.start)
         points.append(segment.end)
@@ -26,7 +36,7 @@ def convert_segments_to_numpy(segments: list[Segment]) -> np.ndarray:
     return points_array
 
 
-def perform_kmeans_clustering(points: np.ndarray, num_clusters: int) -> tuple[np.ndarray, np.ndarray]:
+def perform_kmeans_clustering(points: Array, num_clusters: int) -> tuple[Array, Array]:
     """ Perform KMeans clustering on the points. """
     kmeans = KMeans(num_clusters)
     kmeans.fit(points)
@@ -36,7 +46,7 @@ def perform_kmeans_clustering(points: np.ndarray, num_clusters: int) -> tuple[np
     return centroids, labels
 
 
-def build_graph(centroids: np.ndarray, labels: np.ndarray) -> nx.Graph:
+def build_graph(centroids: Array, labels: Array) -> Graph:
     """Build a graph based on the centroids and their labels"""
     graph = nx.Graph()
     add_nodes_to_graph(graph, centroids)
@@ -47,13 +57,13 @@ def build_graph(centroids: np.ndarray, labels: np.ndarray) -> nx.Graph:
     return graph
 
 
-def add_nodes_to_graph(graph: nx.Graph, centroids: np.ndarray) -> None:
+def add_nodes_to_graph(graph: Graph, centroids: Array) -> None:
     """Add nodes to the graph based on centroids."""
     for i, centroid in enumerate(centroids):
         graph.add_node(i, pos=centroid)
 
 
-def create_edges(labels: np.ndarray) -> list[tuple[int, int]]:
+def create_edges(labels: Array) -> Edges:
     """Create edges based on the labels of the clusters"""
     max_cluster = max(labels) + 1
     adjacency_matrix = create_adjacency_matrix(labels, max_cluster)
@@ -62,15 +72,15 @@ def create_edges(labels: np.ndarray) -> list[tuple[int, int]]:
     return edges
 
 
-def remove_nodes_with_no_edges(graph: nx.Graph) -> None:
+def remove_nodes_with_no_edges(graph: Graph) -> None:
     """Remove nodes from the graph that have no edges."""
     nodes_to_remove = [node for node in graph.nodes() if graph.degree[node] == 0]
     graph.remove_nodes_from(nodes_to_remove)
     
 
-def create_adjacency_matrix(labels: np.ndarray, max_cluster:int) -> list[list[int]]:
+def create_adjacency_matrix(labels: Array, max_cluster:int) -> Matrix:
     """Create an adjacency matrix from the cluster labels."""
-    adjacency_matrix: list[list[int]] = [[0 for _ in range(max_cluster)] for _ in range(max_cluster)]
+    adjacency_matrix: Matrix = [[0 for _ in range(max_cluster)] for _ in range(max_cluster)]
     for i in range(0, len(labels), 2):
         if labels[i] != labels[i + 1]:
             cluster1, cluster2 = labels[i], labels[i + 1]
@@ -79,9 +89,9 @@ def create_adjacency_matrix(labels: np.ndarray, max_cluster:int) -> list[list[in
     return adjacency_matrix
 
 
-def extract_edges_from_matrix(adjacency_matrix: list[list[int]], max_cluster: int) -> list[tuple[int,int]]:
+def extract_edges_from_matrix(adjacency_matrix: Matrix, max_cluster: int) -> Edges:
     """ Extract edges from the adjacency matrix. """
-    centroid_edges: list[tuple[int, int]] = []
+    centroid_edges: Edges = []
     for cluster1 in range(max_cluster):
         for cluster2 in range(max_cluster):
             if adjacency_matrix[cluster1][cluster2] + adjacency_matrix[cluster2][cluster1] >= 2:
@@ -90,7 +100,7 @@ def extract_edges_from_matrix(adjacency_matrix: list[list[int]], max_cluster: in
     return centroid_edges
 
 
-def simplify_graph(graph: nx.Graph, epsilon: float) -> nx.Graph:
+def simplify_graph(graph: Graph, epsilon: float) -> Graph:
     """Simplify the graph by removing nodes with exactly two edges if the angle between the edges is near 180 degrees"""
     nodes_to_remove = find_nodes_to_remove(graph, epsilon)
     remove_nodes(graph, nodes_to_remove)
@@ -98,9 +108,9 @@ def simplify_graph(graph: nx.Graph, epsilon: float) -> nx.Graph:
     return graph 
 
             
-def find_nodes_to_remove(graph: nx.Graph, epsilon: float) -> list[tuple[int, int, int]]:
+def find_nodes_to_remove(graph: Graph, epsilon: float) -> Nodes:
     """Returns the list of nodes which should be simplified"""
-    nodes_to_remove: list[tuple[int, int, int]] = []
+    nodes_to_remove: Nodes = []
     for node in list(graph.nodes):
         neighbors = list(graph.neighbors(node))
         if len(neighbors) == 2:
@@ -112,7 +122,7 @@ def find_nodes_to_remove(graph: nx.Graph, epsilon: float) -> list[tuple[int, int
     return nodes_to_remove
 
 
-def remove_nodes(graph: nx.Graph, nodes_to_remove: list[tuple[int, int, int]]) -> None:
+def remove_nodes(graph: Graph, nodes_to_remove: Nodes) -> None:
     """Remove nodes from the graph and connect their neighbors."""
     for node, neighbor1, neighbor2 in nodes_to_remove:
         if graph.has_node(node) and graph.has_node(neighbor1) and graph.has_node(neighbor2):
@@ -137,7 +147,7 @@ def calculate_angle(p1: list[float], p2: list[float], p3: list[float]) -> float:
 # Example usage
 '''
 segments = load_segments('filename.txt')
-G = create_graph(segments, 20)
+G = make_graph(segments, 20)
 plt.figure(figsize=(10, 8))
 nx.draw(G, with_labels=True, node_color='blue', node_size=12)
 plt.show()
