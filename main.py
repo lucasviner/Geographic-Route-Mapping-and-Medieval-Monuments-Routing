@@ -4,7 +4,6 @@ from viewer import export_png, export_kml
 from segments import Box, Point, Segments, get_segments
 from monuments import download_monuments, load_monuments, Monuments
 from routes import find_routes
-import networkx as nx
 
 
 def main():
@@ -35,6 +34,9 @@ def main():
     monuments_of_the_box = load_monuments(box, 'monuments.dat')
     while True:
         find_optimal_routes(monuments_of_the_box, graph)
+        exit = input("Introduce exit if you would like to exit. If not, introduce any character.")
+        if exit == "exit": break
+        
 
 
 def get_user_input_box() -> Box:
@@ -88,9 +90,11 @@ def find_optimal_routes(monuments: Monuments, graph: Graph) -> None:
     lat = float(input("Latitude: "))
     lon = float(input("Longitude: "))
     point = Point(lat, lon)
+    filename = input("indicate the name, without spaces, of the file where you would like to save the graph with the optimal routes")
     print(f"Calculating optimal routes from ({lat}, {lon}) to nearby monuments...")
-    optimal_routes = find_routes(graph, point, monuments)
-    print(optimal_routes)
+    find_routes(graph, point, monuments, filename)
+    print(f"Done! To watch the results, look the {filename} documents (.png and .kml)")
+    
 
 
 if __name__ == "__main__":
