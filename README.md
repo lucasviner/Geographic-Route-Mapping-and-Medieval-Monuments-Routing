@@ -48,31 +48,24 @@ A step-by-step series of examples that tell you how to get a development environ
 
 ### Running the Tests
 
-Explain how to run the automated tests for this system:
-
 #### Unit Tests:
 bash
 python -m unittest discover tests
 These tests simulate user interactions and verify that the system behaves as expected from start to finish.
 
 ### Deployment
-Add additional notes about how to deploy this on a live system:
-
 1- Set up a virtual environment:
 
 bash
-Copiar código
 python -m venv venv
 source venv/bin/activate  # On Windows use `venv\Scripts\activate`
 2- Install dependencies:
 
 bash
-Copiar código
 pip install -r requirements.txt
 3- Run the application:
 
 bash
-Copiar código
 python main.py
 
 ### Built with
