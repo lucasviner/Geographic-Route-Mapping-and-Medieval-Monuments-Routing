@@ -1,19 +1,32 @@
 # Pràctica GCED-AP2 2024 · Rutes i monuments
 
-Geographic Route Mapping and Medieval Monuments Routing
+## Geographic Route Mapping and Medieval Monuments Routing
 
-## Project Description
+### Project Description
 
 This project allows users to process geographic data, obtain hiking routes within a specified region, infer a map (graph) based on these routes, and find optimal paths to medieval monuments within the region. The results can be visualized in both 2D and 3D formats. Users can export the generated maps in .png and .kml formats and interactively find optimal routes to various points of interest.
 
-## Getting Started
+### Table of Contents
+1. [Getting Started](#getting-started)
+2. [Prerequisites](#prerequisites)
+3. [Installing](#installing)
+4. [Running the Tests](#running-the-tests)
+5. [Deployment](#deployment)
+6. [Built With](#built-with)
+7. [Contributing](#contributing)
+8. [Versioning](#versioning)
+9. [Authors](#authors)
+10. [License](#license)
+11. [Acknowledgments](#acknowledgments)
+12. [Example Workflow](#example-workflow)
+
+### Getting Started
 
 These instructions will get you a copy of the project up and running on your local machine for development and testing purposes. See deployment for notes on how to deploy the project on a live system.
 
 ### Prerequisites
 
 What things you need to install the software and how to install them:
-
 - Python 3.x
 - pip (Python package installer)
 
@@ -21,117 +34,86 @@ What things you need to install the software and how to install them:
 
 A step-by-step series of examples that tell you how to get a development environment running:
 
+1. Install the required Python packages:
+    ```bash
+    pip install -r requirements.txt
+    ```
 
-1. **Install the required Python packages:**
+2. Run the main program:
+    ```bash
+    python main.py
+    ```
 
-   ```sh
-   pip install -r requirements.txt
-   ```
+3. Follow the on-screen instructions to input the coordinates and generate maps.
 
-2. **Run the main program:**
-
-   ```sh
-   python main.py
-   ```
-
-   Follow the on-screen instructions to input the coordinates and generate maps.
-
-### Running the tests
+### Running the Tests
 
 Explain how to run the automated tests for this system:
 
-1. **Unit tests:**
-
-   ```sh
-   python -m unittest discover tests
-   ```
-
-   These tests check the core functionality of the project, including distance calculations and graph construction.
-
-2. **End-to-end tests:**
-
-   ```sh
-   python -m unittest discover e2e_tests
-   ```
-
-   These tests simulate user interactions and verify that the system behaves as expected from start to finish.
+#### Unit Tests:
+bash
+python -m unittest discover tests
+These tests simulate user interactions and verify that the system behaves as expected from start to finish.
 
 ### Deployment
-
 Add additional notes about how to deploy this on a live system:
 
-1. **Set up a virtual environment:**
+1- Set up a virtual environment:
 
-   ```sh
-   python -m venv venv
-   source venv/bin/activate  # On Windows use `venv\Scripts\activate`
-   ```
+bash
+Copiar código
+python -m venv venv
+source venv/bin/activate  # On Windows use `venv\Scripts\activate`
+2- Install dependencies:
 
-2. **Install dependencies:**
+bash
+Copiar código
+pip install -r requirements.txt
+3- Run the application:
 
-   ```sh
-   pip install -r requirements.txt
-   ```
+bash
+Copiar código
+python main.py
 
-3. **Run the application:**
+### Built with
+Python - The programming language used
+NetworkX - Used for creating and manipulating complex networks/graphs
+Matplotlib - Used for generating 2D plots
+SimpleKML - Used for generating KML files
+StaticMap - Used for creating static map images
+BeautifulSoup - Used for parsing HTML data
+Requests - Used for making HTTP requests
+GPXPy - Used for parsing GPX files
+Scikit-learn - Used for clustering algorithms
+Haversine - Used for calculating distances between coordinates
 
-   ```sh
-   python main.py
-   ```
-
-## Built With
-
-- [Python](https://www.python.org/) - The programming language used
-- [NetworkX](https://networkx.github.io/) - Used for creating and manipulating complex networks/graphs
-- [Matplotlib](https://matplotlib.org/) - Used for generating 2D plots
-- [SimpleKML](https://simplekml.readthedocs.io/en/latest/) - Used for generating KML files
-
-## Contributing
-
-Please read `CONTRIBUTING.md` for details on our code of conduct, and the process for submitting pull requests to us.
-
-## Versioning
-
-We use [SemVer](https://semver.org/) for versioning. For the versions available, see the tags on this repository.
-
-## Authors
-
-- **Your Name** - *Initial work* - [YourGitHubProfile](https://github.com/yourusername)
-
-See also the list of [contributors](https://github.com/yourusername/yourprojectname/contributors) who participated in this project.
-
-## License
-
-This project is licensed under the MIT License - see the `LICENSE.md` file for details.
-
-## Acknowledgments
-
-- Hat tip to anyone whose code was used
-- Inspiration from various online resources and communities
-- etc
-
----
+### Authors
+Your Name - Initial work - YourGitHubProfile
 
 ### Example Workflow
+Introduction
+When you start the application, it will guide you through a series of steps to select a geographic region, process hiking routes, infer a map (graph), and find optimal paths to medieval monuments. The key steps and the expected workflow are detailed below.
 
-1. **Introduction:**
+Workflow Steps
+Specify Geographic Region: Define the region of interest by providing the geographical coordinates (latitude and longitude) of the bounding rectangle.
 
-   When you start the application, it will guide you through a series of steps to process geographic data and find routes to medieval monuments. First, the application will download data on all medieval monuments in Catalonia, which may take a few moments.
+Download Hiking Routes: The program fetches GPS routes from OpenStreetMap for the specified region.
 
-2. **Input Coordinates:**
+Process and Cluster Data: The downloaded GPS data is processed, and points are clustered to identify significant waypoints, which become the nodes of the graph.
 
-   You will be prompted to enter the coordinates of the region you want to process in a specific format. This information is used to form a bounding box and download the relevant segments.
+Graph Construction: Create an undirected graph where nodes represent clustered waypoints and edges represent paths between them.
 
-3. **Generating Graphs:**
+Graph Simplification: Simplify the graph by merging nodes and edges based on specified criteria to reduce complexity without losing significant information.
 
-   After forming the bounding box, the system will download the segments and generate a graph based on the hiking routes within the specified region. This step might take a few minutes.
+Medieval Monuments Data: Fetch data about medieval monuments from Catalunya Medieval, including names and coordinates.
 
-4. **Exporting Maps:**
+Find Optimal Routes: Using the graph, calculate the shortest paths from a given starting point to all specified monuments.
 
-   You will have options to export the generated graphs in .png and .kml formats, both, or neither.
+Visualization:
 
-5. **Finding Optimal Routes:**
-
-   After exporting, the application will download data on medieval monuments. You will then be able to input starting points within the region to find and display optimal routes to various monuments. This process can be repeated as many times as needed.
-
-By following these steps, you will be able to visualize and interact with the geographical routes and find the best paths to medieval monuments within the specified region.
+2D Visualization: Generate and save a PNG image of the map with routes using StaticMap.
+3D Visualization: Generate and save a KML file for 3D visualization in Google Earth.
+Example Output
+2D Map Example: A PNG image showcasing the map and routes (insert example image if available).
+3D Map Example: A KML file viewable in Google Earth displaying the routes in 3D (insert example image if available).
+By following these steps, users can interactively explore hiking routes and find optimal paths to medieval monuments within their region of interest.
