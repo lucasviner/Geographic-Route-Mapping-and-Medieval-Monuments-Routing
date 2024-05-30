@@ -85,19 +85,27 @@ def build_route_graph(G: Graph, monument_nodes: set, shortest_paths) -> Graph:
             for path in list(shortest_paths[1].values()):
                 if monument_node in path:
                     path = list(shortest_paths[1][monument_node])
-                    for i in range(len(path) - 1):
-                        u, v = path[i], path[i + 1]
-                        if get_node_position(u) != None and get_node_position(v) != None:
-                            lat1, lon1 = get_node_position(G,u)[0], get_node_position(G,u)[1]
-                            lat2, lon2 = get_node_position(G,v)[0], get_node_position(G,v)[1]
-                            weight = haversine_distance(Point(lat1, lon1), Point(lat2, lon2))
-                            route_graph.add_edge(u, v, weight=weight)
-                            route_graph.add_node(u, pos=(lat1,lon1))
-                            route_graph.add_node(v,pos=(lat2,lon2))
-                        else: 
-                            pass
+                    route_graph = add_nodes_and_edges(G, path)
+                    print(shortest_paths)
+                    print(list(shortest_paths[1][monument_node]))
+
     return route_graph
 
+
+def add_nodes_and_edges(G: Graph, path)->Graph:
+    route_graph = nx.Graph()
+    for i in range(len(path) - 1):
+        u, v = path[i], path[i + 1]
+        if type(get_node_position(G,u)) != None and type(get_node_position(G,v)) != None:
+            lat1, lon1 = get_node_position(G,u)[0], get_node_position(G,u)[1]
+            lat2, lon2 = get_node_position(G,v)[0], get_node_position(G,v)[1]
+            weight = haversine_distance(Point(lat1, lon1), Point(lat2, lon2))
+            route_graph.add_edge(u, v, weight=weight)
+            route_graph.add_node(u, pos=(lat1,lon1))
+            route_graph.add_node(v, pos=(lat2,lon2))
+        else: 
+            pass
+    return route_graph
 
 def save_static_map(G: Graph, start_node: int, monument_nodes: set[int], filename: str) -> None:
     """Generate and save a static map image."""
