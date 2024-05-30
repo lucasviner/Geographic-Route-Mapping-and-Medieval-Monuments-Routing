@@ -3,7 +3,7 @@ from typing import TypeAlias
 from bs4 import BeautifulSoup
 from segments import Point, Box
 from re import findall
-import requests, os
+import requests, os, time
 
 
 @dataclass
@@ -26,8 +26,18 @@ def download_monuments(filename: str) -> None:
 
 def fetch_page_content(url: str) -> bytes:
     """ Fetch the content of a web page. """
-    response = requests.get(url, timeout=20)
-    return response.content
+    attempts = 0 
+    delay, retries = 5, 5
+    while attempts < retries:
+        try:
+            response = requests.get(url, timeout=20)
+            return response.content
+        except requests.RequestException as e: 
+            attempts += 1
+            print(f"Attempt {attempts} failed with error: {e}. Retrying in {delay} seconds...")
+            time.sleep(delay)
+    raise requests.RequestException(f"Failed to fetch page content from {url} after {retries} attempts.")
+
 
 
 def extract_script_tag(content: bytes, keyword: str) -> str:

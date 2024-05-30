@@ -7,7 +7,9 @@ from staticmap import StaticMap, CircleMarker, Line
 from math import *
 import simplekml
 
+
 Routes: TypeAlias = dict[str, list[int]]
+
 
 def find_routes(graph: Graph, start_point: Point, monuments: Monuments, filename: str) -> None:
     """Generate routes and save visualizations."""
@@ -20,8 +22,8 @@ def find_routes(graph: Graph, start_point: Point, monuments: Monuments, filename
         save_static_map(route_graph, start_node, monuments_nodes, f'{filename}.png')
         save_kml(route_graph, start_node, monuments_nodes,  f'{filename}.kml')
     else:
-        save_static_map(graph, start_node, monuments_nodes,  f'{filename}.png')
-        save_kml(graph, start_node, monuments_nodes, f'{filename}.kml')
+        print('No monuments found in the selected box.')
+
 
 def find_closest_node(graph: Graph, point: Point) -> int:
     """Find the closest node in the graph to a given point."""
@@ -35,6 +37,7 @@ def find_closest_node(graph: Graph, point: Point) -> int:
             closest_node = node
     return closest_node
 
+
 def haversine_distance(point1: Point, point2: Point) -> float:
     """Calculate the Haversine distance between two points."""
     R = 6371.0  # Radius of the Earth in kilometers
@@ -47,9 +50,11 @@ def haversine_distance(point1: Point, point2: Point) -> float:
     
     return distance
 
+
 def convert_to_radians(lat: float, lon: float) -> tuple[float, float]:
     """Convert latitude and longitude from degrees to radians."""
     return radians(lat), radians(lon)
+
 
 def get_monuments_nodes(G: Graph, monuments: Monuments) -> set[int]:
     """Get the set of nodes corresponding to the monuments."""
@@ -57,13 +62,16 @@ def get_monuments_nodes(G: Graph, monuments: Monuments) -> set[int]:
     monument_nodes = set(monument_node_map.values())
     return monument_nodes
 
+
 def map_monuments_to_nodes(graph: Graph, monuments: Monuments) -> dict[str, int]:
     """Map each monument to the closest node in the graph."""
     return {monument.name: find_closest_node(graph, monument.location) for monument in monuments}
       
+
 def contains_node(monument_nodes: set, shortest_paths) -> bool:
     """Returns if it contains nodes"""
     return any(monument_node in path for path in shortest_paths[1].values() for monument_node in monument_nodes)
+
 
 def get_node_position(G: Graph, node: int) -> Optional[tuple[float, float]]:
     """Get the position of a node in the graph."""
@@ -79,6 +87,7 @@ def build_route_graph(G: Graph, monument_nodes: set, shortest_paths) -> Graph:
                     path = list(shortest_paths[1][monument_node])
                     for i in range(len(path) - 1):
                         u, v = path[i], path[i + 1]
+                        #POSAR IF
                         lat1, lon1 = get_node_position(G,u)[0], get_node_position(G,u)[1] #REVISAR AQUESTES DUES, DONEN ERROR TIPUS
                         lat2, lon2 = get_node_position(G,v)[0], get_node_position(G,v)[1]
                         weight = haversine_distance(Point(lat1, lon1), Point(lat2, lon2))

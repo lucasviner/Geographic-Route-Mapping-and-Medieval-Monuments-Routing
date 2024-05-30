@@ -2,7 +2,7 @@ from typing import TypeAlias
 from dataclasses import dataclass
 from staticmap import StaticMap, Line
 from datetime import datetime
-import requests, gpxpy, haversine, os, gpxpy.gpx
+import requests, haversine, os, gpxpy.gpx
 
 
 @dataclass
@@ -105,10 +105,11 @@ def get_segments(box: Box, filename: str) -> Segments:
 def show_segments(segments: Segments, filename: str) -> None:
     """Show all segments in a PNG file using staticmaps."""
     static_map = StaticMap(800, 600)
+    width = 2
 
     for segment in segments:
         start_point, end_point = segment.start, segment.end
-        line = Line(((start_point.lat, start_point.lon), (end_point.lat, end_point.lon)), "black", 2)
+        line = Line(((start_point.lat, start_point.lon), (end_point.lat, end_point.lon)), "black", width)
         static_map.add_line(line)
 
     image = static_map.render()
