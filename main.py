@@ -2,7 +2,7 @@ from yogi import read
 from graphmaker import make_graph, Graph
 from viewer import export_png, export_kml
 from segments import Box, Point, Segments, get_segments
-from monuments import download_monuments, load_monuments, Monuments
+from monuments import get_monuments, load_monuments, Monuments
 from routes import find_routes
 
 
@@ -29,7 +29,7 @@ def main():
     export_graph(graph, export_option)
     
     print("Now, we will download the monuments data from Medieval Catalunya. Please wait...")
-    download_monuments('monuments.dat')
+    get_monuments(box, 'monuments.dat')
     print("Download complete! You can now find optimal routes to nearby monuments within the region.")
     monuments_of_the_box = load_monuments(box, 'monuments.dat')
     while True:
