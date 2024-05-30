@@ -1,19 +1,15 @@
-CAL POSAR LES ESTANDARD DE PYTHON????
-
-1) Yogi
-2) Network
-3) Dataclass --> Dataclasses
-4) Typing --> TypeAlias
-5) Staticmap
-6) Datetime
-7) Requests
-8) gpxpy
-9) haversine
-10) re
-11) Beautiful Soup --> Bs4
-12) math
-13) numpy
-14) Kmeans
-15) fastkml
-16) shapely.geometry
-FALTEN POSAR LES DE ROUTES
+yogi
+staticmap
+datetime
+requests
+gpxpy
+haversine
+os
+networkx
+sklearn.cluster
+numpy
+fastkml
+shapely.geometry
+bs4
+re
+simplekml
