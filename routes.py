@@ -1,14 +1,13 @@
 import networkx as nx
-from segments import Point
-from graphmaker import Graph
-from monuments import Monuments
+from segments import Point, get_segments, Box
+from graphmaker import Graph, make_graph
+from monuments import Monuments, load_monuments
 from typing import TypeAlias, Optional
 from staticmap import StaticMap, CircleMarker, Line
 from math import *
 import simplekml
 
 Routes: TypeAlias = dict[str, list[int]]
-
 
 def find_routes(graph: Graph, start_point: Point, monuments: Monuments, filename: str) -> None:
     """Generate routes and save visualizations."""
@@ -18,12 +17,11 @@ def find_routes(graph: Graph, start_point: Point, monuments: Monuments, filename
     
     if contains_node(monuments_nodes, shortest_paths):
         route_graph = build_route_graph(graph, monuments_nodes, shortest_paths)
-        save_static_map(route_graph, start_node, monuments_nodes, filename)
-        save_kml(route_graph, start_node, monuments_nodes, filename )
+        save_static_map(route_graph, start_node, monuments_nodes, f'{filename}.png')
+        save_kml(route_graph, start_node, monuments_nodes,  f'{filename}.kml')
     else:
-        save_static_map(graph, start_node, monuments_nodes, filename)
-        save_kml(graph, start_node, monuments_nodes, filename )
-
+        save_static_map(graph, start_node, monuments_nodes,  f'{filename}.png')
+        save_kml(graph, start_node, monuments_nodes, f'{filename}.kml')
 
 def find_closest_node(graph: Graph, point: Point) -> int:
     """Find the closest node in the graph to a given point."""
@@ -37,7 +35,6 @@ def find_closest_node(graph: Graph, point: Point) -> int:
             closest_node = node
     return closest_node
 
-
 def haversine_distance(point1: Point, point2: Point) -> float:
     """Calculate the Haversine distance between two points."""
     R = 6371.0  # Radius of the Earth in kilometers
@@ -50,11 +47,9 @@ def haversine_distance(point1: Point, point2: Point) -> float:
     
     return distance
 
-
 def convert_to_radians(lat: float, lon: float) -> tuple[float, float]:
     """Convert latitude and longitude from degrees to radians."""
     return radians(lat), radians(lon)
-
 
 def get_monuments_nodes(G: Graph, monuments: Monuments) -> set[int]:
     """Get the set of nodes corresponding to the monuments."""
@@ -62,25 +57,13 @@ def get_monuments_nodes(G: Graph, monuments: Monuments) -> set[int]:
     monument_nodes = set(monument_node_map.values())
     return monument_nodes
 
-
 def map_monuments_to_nodes(graph: Graph, monuments: Monuments) -> dict[str, int]:
     """Map each monument to the closest node in the graph."""
     return {monument.name: find_closest_node(graph, monument.location) for monument in monuments}
-
-        
+      
 def contains_node(monument_nodes: set, shortest_paths) -> bool:
-    """Check if any node in the set is present in the paths."""
-    monument_node_found = False
-    for monument_node in list(monument_nodes):
-        for path in list(shortest_paths[1].values()):
-            if monument_node in path:
-                monument_node_found = True
-                break
-
-    return monument_node_found
-    #Revisar si aixo funciona igual que totes les linies anteriors de codi: 
-    #any(monument_node in path for path in shortest_paths[1].values() for monument_node in monument_nodes)
-
+    """Returns if it contains nodes"""
+    return any(monument_node in path for path in shortest_paths[1].values() for monument_node in monument_nodes)
 
 def get_node_position(G: Graph, node: int) -> Optional[tuple[float, float]]:
     """Get the position of a node in the graph."""
@@ -111,26 +94,10 @@ def save_static_map(G: Graph, start_node: int, monument_nodes: set[int], filenam
     
     for node, data in G.nodes(data=True):
         pos = data['pos']
-        if node == start_node:
-            color = 'green'
-            marker = CircleMarker((pos[0], pos[1]), color, 30)
-            map_imatge.add_marker(marker)
-        elif node in monument_nodes:
-            color = 'red'
-            marker = CircleMarker((pos[0], pos[1]), color, 30)
-            map_imatge.add_marker(marker)
-        else:
-            color = 'blue'
-            marker = CircleMarker((pos[0], pos[1]), color, 10)
-            map_imatge.add_marker(marker)
-    #MIRAR SI ES EL MATEIX QUE:
-    """
-        for node, data in graph.nodes(data=True):
-        pos = data['pos']
         color, size = ('green', 30) if node == start_node else ('red', 30) if node in monument_nodes else ('blue', 10)
         marker = CircleMarker((pos[0], pos[1]), color, size)
-        map_image.add_marker(marker)
-    """
+        map_imatge.add_marker(marker)
+
     
     for u, v in G.edges():
         pos_u, pos_v = G.nodes[u]['pos'], G.nodes[v]['pos']
@@ -147,13 +114,7 @@ def save_kml(graph: Graph, start_node: int, monument_nodes: set[int], filename: 
     
     for node, data in graph.nodes(data=True):
         pos = data['pos']
-        if node == start_node:
-            color = 'ff00ff00'  # Green
-        elif node in monument_nodes:
-            color = 'ff0000ff'  # Red
-        else:
-            color = 'ffff0000'  # Blue
-        #MIRAR SI ES EL MATEIX QUE: color = 'ff00ff00' if node == start_node else 'ff0000ff' if node in monument_nodes else 'ffff0000'
+        color = 'ff00ff00' if node == start_node else 'ff0000ff' if node in monument_nodes else 'ffff0000'
         point = kml.newpoint(name=str(node), coords=[(pos[0], pos[1])])
         point.style.iconstyle.color = color
         point.style.iconstyle.scale = 1
@@ -165,3 +126,10 @@ def save_kml(graph: Graph, start_node: int, monument_nodes: set[int], filename: 
         line.style.linestyle.width = 2
     
     kml.save(filename)
+
+'''monuments = load_monuments(Box(Point(40.5363713, 0.5739316671), Point(40.79886535, 0.9021482)), "monuments.dat")
+segments = get_segments(Box(Point(40.5363713, 0.5739316671), Point(40.79886535, 0.9021482)), "segments.dat")
+G = make_graph(segments, 100)
+start_point = Point(lat=40.55, lon=0.6739316671)
+
+find_routes(G, start_point, monuments, 'routes')'''
