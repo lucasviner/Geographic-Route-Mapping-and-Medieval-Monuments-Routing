@@ -26,7 +26,7 @@ These instructions will get you a copy of the project up and running on your loc
 
 #### Main
 The main program serves as the main entry point for the Medieval Routes Project. It guides the user through a series of steps to process geographic data, create a graph of hiking routes, and find optimal paths to medieval monuments. The results can be visualized and exported in both PNG and KML formats.
-· General Overview
+##### General Overview
 - Introduction: The user is welcomed and given an overview of the project's capabilities.
 - Input Region Coordinates: The user provides the geographical coordinates defining the region of interest.
 - Download Segments: Hiking route segments for the specified region are downloaded and processed.
@@ -38,13 +38,13 @@ The main program serves as the main entry point for the Medieval Routes Project.
 #### Segments
 This script is designed to handle segment processing and visualization for the Medieval Routes Project. It provides functionality to download segments within a specified bounding box from OpenStreetMap, validate and save these segments, load segments from a file, and visualize them using a static map.
 
-· General Overview
+##### General Overview
 - Downloading Segments: Fetch and save segments within a bounding box from OpenStreetMap.
 - Loading Segments: Load previously saved segments from a file.
 - Validating Segments: Ensure segment data meets certain criteria (e.g., date and distance).
 - Visualizing Segments: Create and save a static map image of the segments.
 
-· Key functions
+##### Key functions
 
 1. Download Segments:  This function downloads all segments within the specified bounding box from OpenStreetMap and saves them to a file.
    
@@ -66,31 +66,33 @@ The Monuments module handles retrieving and managing monument data from the Cata
    
 #### Graphmaker
 The GraphMaker program is designed to create and simplify a graph based on geographical segments. It utilizes clustering techniques to organize points, builds a graph from these clusters, and then simplifies the graph by removing certain nodes to improve efficiency and readability.
-· General Overview
+##### General Overview
 - Clustering Points: The program starts by converting geographical segments into a numpy array of points. These points are then clustered using the KMeans algorithm. Clustering helps in grouping nearby points together, reducing the complexity of the graph.
 
 - Building the Graph: Once the points are clustered, the centroids of these clusters are used as nodes in the graph. The program then creates edges between these nodes based on the cluster labels, forming an initial graph.
 
 - Simplifying the Graph: The program simplifies the graph by removing nodes with exactly two edges if the angle between the edges is nearly 180 degrees. This process helps in reducing unnecessary complexity in the graph while preserving the overall structure.
 
-· Key Functions
+##### Key Functions
 1. make_graph: This is the main function that coordinates the entire process. It converts segments into points, performs clustering, builds the initial graph, and then simplifies it.
 
 2. simplify_graph: This function simplifies the graph by removing nodes with exactly two edges if the angle between the edges is near 180 degrees. This helps in reducing the complexity of the graph without losing significant information.
 #### Viewer
 The Viewer program provides functionalities to export a graph to PNG and KML formats. The PNG export uses the StaticMap library for rendering static map images, while the KML export uses the fastKML library to generate KML files suitable for viewing in applications like Google Earth.
 
-· General Overview
+##### General Overview
 - Exporting to PNG:
-
    Purpose: This part of the module generates a static image of the graph, highlighting nodes and edges.
+  
    Process: The graph's edges and nodes are added to a StaticMap object. The map is then rendered and saved as a PNG file.
+  
 - Exporting to KML:
+  Purpose: This part of the module generates a KML file, which can be viewed in 3D mapping applications like Google Earth.
+  
+  Process: The graph's nodes and edges are converted to KML placemarks and lines. These are added to a KML document, which is then saved to a file.
+  
 
-Purpose: This part of the module generates a KML file, which can be viewed in 3D mapping applications like Google Earth.
-Process: The graph's nodes and edges are converted to KML placemarks and lines. These are added to a KML document, which is then saved to a file.
-
-· Key Functions
+##### Key Functions
 1. export_png: This is the main function for exporting the graph to a PNG file. It creates a StaticMap object, adds the graph's edges and nodes, renders the map, and saves the image.
 2. export_kml: This is the main function for exporting the graph to a KML file. It creates a KML document, adds the graph's nodes and edges as KML placemarks, and saves the document to a file.
 #### Routes
