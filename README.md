@@ -8,13 +8,15 @@ This project allows users to process geographic data, obtain hiking routes withi
 
 ### Table of Contents
 1. [Getting Started](#getting-started)
-2. [Prerequisites](#prerequisites)
-3. [Installing](#installing)
-4. [Running the Tests](#running-the-tests)
-5. [Deployment](#deployment)
-6. [Built With](#built-with)
-7. [Authors](#authors)
-8. [Example Workflow](#example-workflow)
+2. [What each program does](#what-each-program-does)
+3. [Program Architecture](#Program-Architecture)
+4. [Prerequisites](#prerequisites)
+6. [Installing](#installing)
+7. [Running the Tests](#running-the-tests)
+8. [Deployment](#deployment)
+9. [Built With](#built-with)
+10. [Authors](#authors)
+11. [Example Workflow](#example-workflow)
 
 ### Getting Started
 
@@ -23,17 +25,36 @@ These instructions will get you a copy of the project up and running on your loc
 ### What each program does
 
 #### Main
-The main program serves as the entry point for the entire application. It orchestrates the interaction between different modules and coordinates the execution of various functionalities.
+The main program serves as the main entry point for the Medieval Routes Project. It guides the user through a series of steps to process geographic data, create a graph of hiking routes, and find optimal paths to medieval monuments. The results can be visualized and exported in both PNG and KML formats.
+· General Overview
+- Introduction: The user is welcomed and given an overview of the project's capabilities.
+- Input Region Coordinates: The user provides the geographical coordinates defining the region of interest.
+- Download Segments: Hiking route segments for the specified region are downloaded and processed.
+- Create Graph: A graph is created from the segments using clustering to identify key waypoints.
+- Export Options: The user can choose to export the graph to PNG, KML, or both formats.
+- Download Monuments Data: Data about medieval monuments in the region is fetched.
+- Find Optimal Routes: The user can find and export the optimal routes from a specified starting point to the monuments.
+  
 #### Segments
-The Segments module facilitates the retrieval and processing of route data from OpenStreetMaps within a specified geographic area defined by a bounding box. It offers three main functionalities:
+This script is designed to handle segment processing and visualization for the Medieval Routes Project. It provides functionality to download segments within a specified bounding box from OpenStreetMap, validate and save these segments, load segments from a file, and visualize them using a static map.
 
-1. Download Segments: Fetches route data within a specified bounding box from OpenStreetMaps and saves it to a file. Segments are filtered based on criteria such as their creation date(needs to be newer than the limit year) and the distance between points(the distance between them needs to be lower than 0.1km).
+· General Overview
+- Downloading Segments: Fetch and save segments within a bounding box from OpenStreetMap.
+- Loading Segments: Load previously saved segments from a file.
+- Validating Segments: Ensure segment data meets certain criteria (e.g., date and distance).
+- Visualizing Segments: Create and save a static map image of the segments.
 
-2. Load Segments: Reads route data from a file, allowing access to previously downloaded segments within the specified area.
+· Key functions
 
-3. Get Segments: Depending on the existence of a file, either load segments from it or download them if the file does not exist.
+1. Download Segments:  This function downloads all segments within the specified bounding box from OpenStreetMap and saves them to a file.
    
-5. View Segments: Using static Maps, offers an option to visualize the retrieved segments.
+2. Validate Segments: Ensures segments meet specified criteria, such as the year of data(need to be newer than the limit year) and distance between points(need to be closer than 0.1km).
+   
+3. Load Segments: Reads segments from a file into a list of segment objects.
+
+4. Get Segments: Depending on the existence of a file, either load segments from it or download them if the file does not exist.
+   
+5. View Segments: Creates a static map image of the segments and saves it as a PNG file.
    
 #### Monuments
 The Monuments module handles retrieving and managing monument data from the Catalunya Medieval website. It provides functionalities tailored for working with monument information:
@@ -44,13 +65,38 @@ The Monuments module handles retrieving and managing monument data from the Cata
 3. Get Monuments: Similar to the Get Segments function, it either loads monuments from a file or downloads them if the file does not exist. It also allows the filtering of monuments based on a specified bounding box.
    
 #### Graphmaker
-The Graphmaker module is responsible for generating graphs from geometric data. It converts segments and other spatial information into graph structures, facilitating the representation and analysis of spatial networks.
+The GraphMaker program is designed to create and simplify a graph based on geographical segments. It utilizes clustering techniques to organize points, builds a graph from these clusters, and then simplifies the graph by removing certain nodes to improve efficiency and readability.
+· General Overview
+- Clustering Points: The program starts by converting geographical segments into a numpy array of points. These points are then clustered using the KMeans algorithm. Clustering helps in grouping nearby points together, reducing the complexity of the graph.
+
+- Building the Graph: Once the points are clustered, the centroids of these clusters are used as nodes in the graph. The program then creates edges between these nodes based on the cluster labels, forming an initial graph.
+
+- Simplifying the Graph: The program simplifies the graph by removing nodes with exactly two edges if the angle between the edges is nearly 180 degrees. This process helps in reducing unnecessary complexity in the graph while preserving the overall structure.
+
+· Key Functions
+1. make_graph: This is the main function that coordinates the entire process. It converts segments into points, performs clustering, builds the initial graph, and then simplifies it.
+
+2. simplify_graph: This function simplifies the graph by removing nodes with exactly two edges if the angle between the edges is near 180 degrees. This helps in reducing the complexity of the graph without losing significant information.
 #### Viewer
-The Viewer program offers visualization capabilities for the generated graphs and associated spatial data. It allows users to explore and inspect graph structures and spatial relationships interactively.
+The Viewer program provides functionalities to export a graph to PNG and KML formats. The PNG export uses the StaticMap library for rendering static map images, while the KML export uses the fastKML library to generate KML files suitable for viewing in applications like Google Earth.
+
+· General Overview
+- Exporting to PNG:
+
+   Purpose: This part of the module generates a static image of the graph, highlighting nodes and edges.
+   Process: The graph's edges and nodes are added to a StaticMap object. The map is then rendered and saved as a PNG file.
+- Exporting to KML:
+
+Purpose: This part of the module generates a KML file, which can be viewed in 3D mapping applications like Google Earth.
+Process: The graph's nodes and edges are converted to KML placemarks and lines. These are added to a KML document, which is then saved to a file.
+
+· Key Functions
+1. export_png: This is the main function for exporting the graph to a PNG file. It creates a StaticMap object, adds the graph's edges and nodes, renders the map, and saves the image.
+2. export_kml: This is the main function for exporting the graph to a KML file. It creates a KML document, adds the graph's nodes and edges as KML placemarks, and saves the document to a file.
 #### Routes
 The Routes module finds and generates optimal routes between specified locations or landmarks. It employs graph algorithms and spatial analysis techniques to compute shortest paths and visualize route information for navigation.
 
-### Arquitectura del programa
+### Program Architecture
 
 ### Prerequisites
 
