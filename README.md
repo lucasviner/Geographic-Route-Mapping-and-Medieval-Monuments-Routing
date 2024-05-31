@@ -1,5 +1,7 @@
 # Pràctica GCED-AP2 2024 · Rutes i monuments
 
+FALTA: ROUTES I MONUMENTS QUE FAN BEN EXPLICAT, ARQUITECTURA DEL PROGRAMA, AFEGIR FOTOS A LA PART FINAL COM A EXEMPLES, EXPLICAR DECISIONS DE DISSENY QUE HAGUEM FET. 
+
 ## Geographic Route Mapping and Medieval Monuments Routing
 
 ### Project Description
@@ -81,11 +83,13 @@ The Viewer program provides functionalities to export a graph to PNG and KML for
 
 ##### General Overview
 - Exporting to PNG:
-   Purpose: This part of the module generates a static image of the graph, highlighting nodes and edges.
+
+  Purpose: This part of the module generates a static image of the graph, highlighting nodes and edges.
   
-   Process: The graph's edges and nodes are added to a StaticMap object. The map is then rendered and saved as a PNG file.
+  Process: The graph's edges and nodes are added to a StaticMap object. The map is then rendered and saved as a PNG file.
   
 - Exporting to KML:
+
   Purpose: This part of the module generates a KML file, which can be viewed in 3D mapping applications like Google Earth.
   
   Process: The graph's nodes and edges are converted to KML placemarks and lines. These are added to a KML document, which is then saved to a file.
