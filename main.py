@@ -4,7 +4,6 @@ from viewer import export_png, export_kml
 from segments import Box, Point, Segments, get_segments
 from monuments import get_monuments, load_monuments, Monuments
 from routes import find_routes
-import traceback
 
 
 def main() -> None:
@@ -31,7 +30,7 @@ def main() -> None:
     
     while True:
         find_optimal_routes(monuments_of_the_box, graph)
-        decision = input("Introduce 'exit' if you would like to exit.\nIntroduce 'restart' if you would like to define a new box.\nIf not, introduce any character: \n")
+        decision = input("Introduce 'exit' if you would like to exit.\nIntroduce 'restart' if you would like to define a new box.\nIf you want to continue, introduce any character: \n")
         if decision == "exit": break
         if decision == "restart": 
             main() 
@@ -39,6 +38,7 @@ def main() -> None:
 
 
 def introduction() -> None:
+    """ Prints the initial introduction. """
     print("Welcome to the Medieval Routes Project!")
     print("In this project, you will be able to:")
     print("1. Obtain hiker routes in a geographic region.")
@@ -75,7 +75,13 @@ def get_segments_in_box(box: Box) -> Segments:
 
 def create_graph(segments: Segments) -> Graph:
     """Create a graph from the given segments."""
-    return make_graph(segments, num_clusters=100)
+    while True:
+        print("Please, indicate the number of clusters:\n")
+        try:
+            num_clusters = read(int)
+            return make_graph(segments, num_clusters)
+        except ValueError:
+            print("Invalid value. Please, introduce a number") 
 
 
 def get_export_option() -> int:
@@ -87,31 +93,35 @@ def get_export_option() -> int:
             print("2) --> Export to .kml file")
             print("3) --> Export to both .png and .kml files")
             print("4) --> Do not export")
-            return read(int)
+            option = read(int)
+            if option not in {1, 2, 3, 4}:
+                print("Invalid input. Please enter a number between 1 and 4.")
+            else:
+                return option
         except ValueError:
             print("Invalid input. Please enter a number between 1 and 4.")
-
+            
 
 def export_graph(graph: Graph, export_option: int) -> None:
     """Export the graph routes based on the chosen export option."""
     if export_option == 4:
         print("No export selected.")
         return
+    if export_option == 1:
+        filename_png = get_filename('graph.png')
+        export_png(graph, f"{filename_png}.png")
+        print(f"Graph routes exported to {filename_png}.png")
+    elif export_option == 2:
+        filename_kml = get_filename('graph.kml')
+        export_kml(graph, f"{filename_kml}.kml")
+        print(f"Graph routes exported to {filename_kml}.kml")
     else:
-        if export_option == 1:
-            filename_png = get_filename('graph.png')
-            export_png(graph, f"{filename_png}.png")
-            print("Graph routes exported to graph.png")
-        elif export_option == 2:
-            filename_kml = get_filename('graph.kml')
-            export_kml(graph, f"{filename_kml}.kml")
-            print("Graph routes exported to graph.kml")
-        else:
-            filename_png = get_filename('graph.png')
-            filename_kml = get_filename('graph.kml')
-            export_png(graph, f"{filename_png}.png")
-            export_kml(graph, f"{filename_kml}.kml")
-            print(f"Graph routes exported to {filename_png}.png and {filename_kml}.kml")
+        filename_png = get_filename('graph.png')
+        filename_kml = get_filename('graph.kml')
+        export_png(graph, f"{filename_png}.png")
+        export_kml(graph, f"{filename_kml}.kml")
+        print(f"Graph routes exported to {filename_png}.png and {filename_kml}.kml")
+
 
 def find_optimal_routes(monuments: Monuments, graph: Graph) -> None:
     """Prompt the user to input an initial point and find optimal routes to nearby monuments within the region."""
@@ -123,8 +133,9 @@ def find_optimal_routes(monuments: Monuments, graph: Graph) -> None:
             point = Point(lat, lon)
             filename_routes = get_filename('routes')
             print(f"Calculating optimal routes from ({lat}, {lon}) to nearby monuments...")
-            find_routes(graph, point, monuments, filename_routes)
-            print(f"Done! To watch the results, look the {filename_routes} documents (.png and .kml)")
+            contains_monuments = find_routes(graph, point, monuments, filename_routes)
+            if contains_monuments == 1:
+                print(f"Done! To watch the results, look the {filename_routes} documents (.png and .kml)")
             return
         except ValueError:
             print("Invalid input. Please enter numeric values for latitude and longitude.")    
@@ -132,3 +143,6 @@ def find_optimal_routes(monuments: Monuments, graph: Graph) -> None:
 
 if __name__ == "__main__":
     main()
+    
+#Box(Point(40.5363713, 0.5739316671), Point(40.79886535, 0.9021482)
+#Box(Point(40.5363713, 0.8139316671), Point(40.79886535, 0.90211422)

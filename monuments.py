@@ -27,7 +27,7 @@ def download_monuments(filename: str) -> None:
 def fetch_page_content(url: str) -> bytes:
     """ Fetch the content of a web page. """
     attempts = 0 
-    delay, retries = 5, 5
+    delay, retries = 5, 10
     while attempts < retries:
         try:
             response = requests.get(url, timeout=20)
@@ -37,7 +37,6 @@ def fetch_page_content(url: str) -> bytes:
             print(f"Attempt {attempts} failed with error: {e}. Retrying in {delay} seconds...")
             time.sleep(delay)
     raise requests.RequestException(f"Failed to fetch page content from {url} after {retries} attempts.")
-
 
 
 def extract_script_tag(content: bytes, keyword: str) -> str:
@@ -61,11 +60,16 @@ def parse_monument_data(script_content: str) -> Monuments:
     
     monuments: Monuments = []
     for i, location in enumerate(locations):
-        title = bytes(titles[i], "utf-8").decode("unicode_escape")
+        title = decode_title(titles[i])
         lat, lon = map(float, location)
         monuments.append(Monument(title, Point(lat, lon)))
     
     return monuments
+
+
+def decode_title(title: str) -> str:
+    """Decode the title from unicode escape sequences."""
+    return bytes(title, "utf-8").decode("unicode_escape")
 
 
 def save_monuments_to_file(monuments: Monuments, filename: str) -> None:
@@ -110,10 +114,3 @@ def get_monuments(box: Box, filename: str) -> Monuments:
     if not os.path.exists(filename):
         download_monuments(filename)
     return load_monuments(box,filename)
-    
-
-
-# COMPROVACIÓ
-
-#download_monuments("monuments.dat")
-#print(get_monuments(Box(Point(40.5363713, 0.5739316671), Point(40.79886535, 0.9021482)), "monuments.dat"))

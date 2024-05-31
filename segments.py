@@ -60,11 +60,11 @@ def fetch_gpx_content(url: str) -> str:
 
 def is_valid(p1: point, p2: point) -> bool:
     """Check if the data between two points is valid according to the specified criteria."""
-    limit_year = 2015
+    LIMIT_YEAR = 2015
     t_point1 = datetime.strptime(str(p1.time), "%Y-%m-%d %H:%M:%S%z")
     t_point2 = datetime.strptime(str(p2.time), "%Y-%m-%d %H:%M:%S%z")
 
-    if t_point1.year < limit_year or t_point2.year < limit_year:
+    if t_point1.year < LIMIT_YEAR or t_point2.year < LIMIT_YEAR:
         return False
 
     distance = haversine.haversine((p1.latitude, p1.longitude), (p2.latitude, p2.longitude))
@@ -114,12 +114,3 @@ def show_segments(segments: Segments, filename: str) -> None:
 
     image = static_map.render()
     image.save(filename)
-
-
-# COMPROVAR QUE FUNCIONEN
-
-# print(load_segments("filename.txt"))
-# print(get_segments(Box(Point(40.5363713, 0.5739316671), Point(40.79886535, 0.9021482)), "segments.dat"))
-#show_segments(get_segments(Box(Point(40.5363713, 0.5739316671), Point(40.79886535, 0.9021482)), "segments.dat"),"foto.png")
-#download_segments(Box(Point(40.5363713, 0.5739316671), Point(40.79886535, 0.9021482)), "segments.dat")
-#download_segments(Box(Point(40.5363713, 0.8139316671), Point(40.79886535, 0.90211422)), "segments.dat")

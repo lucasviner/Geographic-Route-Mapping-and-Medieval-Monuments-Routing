@@ -1,18 +1,17 @@
-import networkx as nx
 from sklearn.cluster import KMeans
-from segments import Segment, Point, load_segments, Segments
-import numpy as np
+from segments import Point, Segments
 from math import acos, degrees
 from typing import TypeAlias
+import networkx as nx
+import numpy as np
 
 
 Graph: TypeAlias = nx.Graph
 Matrix: TypeAlias = list[list[int]]
 Nodes: TypeAlias = list[tuple[int, int, int]]
-Array: TypeAlias = np.ndarray
 Edges: TypeAlias = list[tuple[int, int]]
+Array: TypeAlias = np.ndarray
 Points: TypeAlias = list[Point]
-
 
 
 def make_graph(segments: Segments, num_clusters: int) -> Graph:
@@ -20,19 +19,15 @@ def make_graph(segments: Segments, num_clusters: int) -> Graph:
     points = convert_segments_to_numpy(segments)
     centroids, labels = perform_kmeans_clustering(points, num_clusters)
     graph = build_graph(centroids, labels)
-    simplified_graph = simplify_graph(graph, 20)
+    simplified_graph = simplify_graph(graph, epsilon=20)
 
     return simplified_graph
 
 
 def convert_segments_to_numpy(segments: Segments) -> Array:
     """Convert a list of segments to a numpy array of points"""
-    points: Points = []
-    for segment in segments:
-        points.append(segment.start)
-        points.append(segment.end)
+    points = [point for segment in segments for point in (segment.start, segment.end)]
     points_array = np.array([[point.lat, point.lon] for point in points])
-
     return points_array
 
 
@@ -70,12 +65,6 @@ def create_edges(labels: Array) -> Edges:
     edges = extract_edges_from_matrix(adjacency_matrix, max_cluster)
     
     return edges
-
-
-def remove_nodes_with_no_edges(graph: Graph) -> None:
-    """Remove nodes from the graph that have no edges."""
-    nodes_to_remove = [node for node in graph.nodes() if graph.degree[node] == 0]
-    graph.remove_nodes_from(nodes_to_remove)
     
 
 def create_adjacency_matrix(labels: Array, max_cluster:int) -> Matrix:
@@ -100,6 +89,12 @@ def extract_edges_from_matrix(adjacency_matrix: Matrix, max_cluster: int) -> Edg
     return centroid_edges
 
 
+def remove_nodes_with_no_edges(graph: Graph) -> None:
+    """Remove nodes from the graph that have no edges."""
+    nodes_to_remove = [node for node, degree in graph.nodes() if degree == 0]
+    graph.remove_nodes_from(nodes_to_remove)
+
+
 def simplify_graph(graph: Graph, epsilon: float) -> Graph:
     """Simplify the graph by removing nodes with exactly two edges if the angle between the edges is near 180 degrees"""
     nodes_to_remove = find_nodes_to_remove(graph, epsilon)
@@ -114,8 +109,8 @@ def find_nodes_to_remove(graph: Graph, epsilon: float) -> Nodes:
     for node in list(graph.nodes):
         neighbors = list(graph.neighbors(node))
         if len(neighbors) == 2:
-            p1, p2, p3 = graph.nodes[neighbors[0]]['pos'], graph.nodes[node]['pos'], graph.nodes[neighbors[1]]['pos']
-            angle = calculate_angle(p1, p2, p3)
+            point1, point2, point3 = graph.nodes[neighbors[0]]['pos'], graph.nodes[node]['pos'], graph.nodes[neighbors[1]]['pos']
+            angle = calculate_angle(point1, point2, point3)
             if abs(angle - 180) < epsilon:
                 nodes_to_remove.append((node, neighbors[0], neighbors[1]))
                 
@@ -126,29 +121,16 @@ def remove_nodes(graph: Graph, nodes_to_remove: Nodes) -> None:
     """Remove nodes from the graph and connect their neighbors."""
     for node, neighbor1, neighbor2 in nodes_to_remove:
         if graph.has_node(node) and graph.has_node(neighbor1) and graph.has_node(neighbor2):
-            # Add edge between the two neighbors if not already present
             if not graph.has_edge(neighbor1, neighbor2):
                 graph.add_edge(neighbor1, neighbor2)
-            # Remove the node and its edges
             graph.remove_node(node)
 
 
 def calculate_angle(p1: list[float], p2: list[float], p3: list[float]) -> float:
     """Calculate the angle between three points p1, p2, and p3 with p2 being the vertex"""
-
-    v1 = np.array([p1[0] - p2[0], p1[1] - p2[1]])
-    v2 = np.array([p3[0] - p2[0], p3[1] - p2[1]])
-    cos_angle = np.dot(v1, v2) / (np.linalg.norm(v1) * np.linalg.norm(v2))
+    vector1 = np.array([p1[0] - p2[0], p1[1] - p2[1]])
+    vector2 = np.array([p3[0] - p2[0], p3[1] - p2[1]])
+    cos_angle = np.dot(vector1, vector2) / (np.linalg.norm(vector1) * np.linalg.norm(vector2))
     angle = degrees(acos(cos_angle))
 
     return angle
-
-
-# Example usage
-'''
-segments = load_segments('filename.txt')
-G = make_graph(segments, 20)
-plt.figure(figsize=(10, 8))
-nx.draw(G, with_labels=True, node_color='blue', node_size=12)
-plt.show()
-'''
