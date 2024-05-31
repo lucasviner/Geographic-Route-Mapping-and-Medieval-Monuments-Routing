@@ -11,16 +11,15 @@ This project allows users to process geographic data, obtain hiking routes withi
 2. [What each program does](#what-each-program-does)
 3. [Program Architecture](#Program-Architecture)
 4. [Prerequisites](#prerequisites)
-6. [Installing](#installing)
-7. [Running the Tests](#running-the-tests)
-8. [Deployment](#deployment)
-9. [Built With](#built-with)
-10. [Authors](#authors)
-11. [Example Workflow](#example-workflow)
+5. [Installing](#installing)
+6. [Running the Tests](#running-the-tests)
+7. [Built With](#built-with)
+8. [Example Workflow](#example-workflow)
+9. [Authors](#authors)
 
 ### Getting Started
 
-These instructions will get you a copy of the project up and running on your local machine for development and testing. Please take a look at deployment for notes on how to deploy the project on a live system.
+These instructions will get you a copy of the project up and running on your local machine for development and testing. 
 
 ### What each program does
 
@@ -130,22 +129,6 @@ python -m unittest discover tests
 ```
 These tests simulate user interactions and verify that the system behaves as expected from start to finish.
 
-### Deployment
-1. Set up a virtual environment:
-```bash
-python -m venv venv
-source venv/bin/activate  # On Windows use `venv\Scripts\activate`
-```
-
-2. Install dependencies:
-```bash
-pip install -r requirements.txt
-```
-3. Run the application:
-```bash
-python main.py
-```
-
 ### Built with
 - Python - The programming language used
 - NetworkX - Used for creating and manipulating complex networks/graphs
@@ -157,9 +140,6 @@ python main.py
 - GPXPy - Used for parsing GPX files
 - Scikit-learn - Used for clustering algorithms
 - Haversine - Used for calculating distances between coordinates
-
-### Authors
-Your Name - Initial work - YourGitHubProfile
 
 ### Example Workflow
 #### Introduction
@@ -193,3 +173,6 @@ When you start the application, it will guide you through a series of steps to s
 3D Map Example: A KML file viewable in Google Earth displaying the routes in 3D (insert example image if available).
 
 By following these steps, users can interactively explore hiking routes and find optimal paths to medieval monuments within their region of interest.
+
+### Authors
+Lucas Federico Viner & Oriol Parent
