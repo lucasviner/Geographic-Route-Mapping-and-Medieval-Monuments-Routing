@@ -1,6 +1,6 @@
 # Pràctica GCED-AP2 2024 · Rutes i monuments
 
-FALTA: ROUTES I MONUMENTS QUE FAN BEN EXPLICAT, ARQUITECTURA DEL PROGRAMA, AFEGIR FOTOS A LA PART FINAL COM A EXEMPLES, EXPLICAR DECISIONS DE DISSENY QUE HAGUEM FET. 
+FALTA: ARQUITECTURA DEL PROGRAMA, AFEGIR FOTOS A LA PART FINAL COM A EXEMPLES, EXPLICAR DECISIONS DE DISSENY QUE HAGUEM FET. 
 
 ## Geographic Route Mapping and Medieval Monuments Routing
 
@@ -47,26 +47,62 @@ This script is designed to handle segment processing and visualization for the M
 
 ##### Key functions
 
-1. Download Segments:  This function downloads all segments within the specified bounding box from OpenStreetMap and saves them to a file.
-   
-2. Validate Segments: Ensures segments meet specified criteria, such as the year of data(need to be newer than the limit year) and distance between points(need to be closer than 0.1km).
-   
-3. Load Segments: Reads segments from a file into a list of segment objects.
+1. Download Segments
+  - This function downloads all segments within the specified bounding box from OpenStreetMap and saves them to a file.
 
-4. Get Segments: Depending on the existence of a file, either load segments from it or download them if the file does not exist.
-   
-5. View Segments: Creates a static map image of the segments and saves it as a PNG file.
-   
+2. Validate Segments
+  - Ensures segments meet specified criteria, such as the year of data(need to be newer than the limit year) and distance between points(need to be closer than 0.1km).
+
+3. Load Segments
+  - Reads segments from a file into a list of segment objects.
+    
+4. Get Segments
+  -  Depending on the existence of a file, either load segments from it or download them if the file does not exist.
+    
+5. View Segments
+  - Creates a static map image of the segments and saves it as a PNG file.
+    
 #### Monuments
-The Monuments module handles retrieving and managing monument data from the Catalunya Medieval website. It provides functionalities tailored for working with monument information:
-1. Download Monuments: Retrieve monument data from the Catalunya Medieval website and save it to a file.
+This script is designed to handle monument processing for the Medieval Routes Project. It provides functionality to download monument data from a website, parse and save this data, load monuments from a file, and filter monuments based on a specified bounding box.
 
-2. Load Monuments: Reads monument data from a file, enabling access to previously downloaded monuments. It offers the flexibility to filter monuments based on their geographic location within a specified bounding box.
+##### General Overview
+- Downloading Monuments: Fetch and save monument data from the Catalunya Medieval website.
+- Parsing Data: Extract and parse monument information from the downloaded content.
+- Loading Monuments: Load monument data from a file and filter by location within a specified bounding box.
+- Data Handling: Decode monument titles and manage data extraction.
 
-3. Get Monuments: Similar to the Get Segments function, it either loads monuments from a file or downloads them if the file does not exist. It also allows the filtering of monuments based on a specified bounding box.
+##### Key Functions
+1. Download Monuments
    
+  - This function downloads monument data from the Catalunya Medieval website and saves it to a specified file.
+  - It fetches the page content, extracts the relevant script tag, parses the monument data, and saves it to a file.
+
+2. Fetch Page Content
+   
+  - Fetches the content of a web page, with retry logic in case of request failures.
+    
+3. Extract Script Tag
+
+  - Extracts the script tag containing a specified keyword from the fetched web page content.
+
+4. Save Monuments to File
+
+  - Saves a list of monuments to a specified file, writing their names and coordinates.
+
+5. Load Monuments
+
+  - Loads monument data from a file and filters monuments based on their location within a specified bounding box.
+  - Reads the file line by line, extracts monument data, and checks if each monument is within the given bounding box.
+
+6. Get Monuments:
+   
+  - Retrieves all monuments within a specified bounding box.
+  - If the specified file exists, it loads monuments from the file.
+  - If the file does not exist, it downloads the monument data and saves it to the file before loading the monuments.
+
 #### Graphmaker
 The GraphMaker program is designed to create and simplify a graph based on geographical segments. It utilizes clustering techniques to organize points, builds a graph from these clusters, and then simplifies the graph by removing certain nodes to improve efficiency and readability.
+
 ##### General Overview
 - Clustering Points: The program starts by converting geographical segments into a numpy array of points. These points are then clustered using the KMeans algorithm. Clustering helps in grouping nearby points together, reducing the complexity of the graph.
 
@@ -75,31 +111,104 @@ The GraphMaker program is designed to create and simplify a graph based on geogr
 - Simplifying the Graph: The program simplifies the graph by removing nodes with exactly two edges if the angle between the edges is nearly 180 degrees. This process helps in reducing unnecessary complexity in the graph while preserving the overall structure.
 
 ##### Key Functions
-1. make_graph: This is the main function that coordinates the entire process. It converts segments into points, performs clustering, builds the initial graph, and then simplifies it.
+1. make_graph
+  - Main function that coordinates the entire process.
+  - Converts segments into points
+  - Performs clustering
+  - Builds the initial graph
+  - Simplifies the graph.
 
-2. simplify_graph: This function simplifies the graph by removing nodes with exactly two edges if the angle between the edges is near 180 degrees. This helps in reducing the complexity of the graph without losing significant information.
+2. simplify_graph
+  - Simplifies the graph by removing nodes with exactly two edges if the angle between the edges is near 180 degrees.
+  - Helps in reducing the complexity of the graph without losing significant information.
+
 #### Viewer
-The Viewer program provides functionalities to export a graph to PNG and KML formats. The PNG export uses the StaticMap library for rendering static map images, while the KML export uses the fastKML library to generate KML files suitable for viewing in applications like Google Earth.
+This script is designed to handle the visualization of graphs for the Medieval Routes Project. It provides functionality to export graph data as static map images (PNG) and KML files for visualization in Google Earth.
 
 ##### General Overview
-- Exporting to PNG:
 
-  Purpose: This part of the module generates a static image of the graph, highlighting nodes and edges.
-  
-  Process: The graph's edges and nodes are added to a StaticMap object. The map is then rendered and saved as a PNG file.
-  
-- Exporting to KML:
-
-  Purpose: This part of the module generates a KML file, which can be viewed in 3D mapping applications like Google Earth.
-  
-  Process: The graph's nodes and edges are converted to KML placemarks and lines. These are added to a KML document, which is then saved to a file.
+- Exporting to PNG: Create and save a static map image of the graph.
+- Exporting to KML: Create and save a KML file of the graph for visualization in Google Earth.
+- Adding Nodes and Edges: Add graph nodes and edges to both static maps and KML files.
   
 
 ##### Key Functions
-1. export_png: This is the main function for exporting the graph to a PNG file. It creates a StaticMap object, adds the graph's edges and nodes, renders the map, and saves the image.
-2. export_kml: This is the main function for exporting the graph to a KML file. It creates a KML document, adds the graph's nodes and edges as KML placemarks, and saves the document to a file.
+1. Export PNG:
+
+  - This function exports the graph to a PNG file using the staticmap library.
+  - It adds nodes and edges to the static map and saves the rendered image to a specified file.
+
+2. Add Edges to Static Map:
+
+  - Adds the edges of the graph to a static map as lines.
+  - Each edge is represented by a black line with a specified width.
+
+3. Add Nodes to Static Map:
+
+  - Adds the nodes of the graph to a static map as circle markers.
+  - Each node is represented by a blue circle with a specified width.
+
+4. Export KML:
+
+  - This function exports the graph to a KML file using the fastkml library.
+  - It adds nodes and edges to a KML document and saves it to a specified file.
+
+5. Add Nodes to KML:
+
+  - Adds the nodes of the graph to a KML document as placemarks.
+  - Each node is represented by a placemark with its geographic coordinates.
+ 
+ 6. Add Edges to KML:
+
+  - Adds the edges of the graph to a KML document as placemarks.
+  - Each edge is represented by a line string connecting the start and end positions.
+
+7. Save KML to File:
+
+  - Saves the content of a KML object to a specified file.
+  - Writes the KML data to a file in string format.
+
 #### Routes
-The Routes module finds and generates optimal routes between specified locations or landmarks. It employs graph algorithms and spatial analysis techniques to compute shortest paths and visualize route information for navigation.
+This script is designed to generate routes for the Medieval Routes Project, connecting a starting point with nearby monuments within a specified area. It provides functionality to find the closest node to a starting point, compute the shortest paths in a graph, identify nodes corresponding to monuments, and visualize the routes using static maps and KML files.
+
+##### General Overview
+- Finding Routes: Identify the shortest paths from a starting point to multiple monuments and save the visualizations.
+- Computing Distances: Calculate Haversine distances between geographic points.
+- Node Management: Map geographic points to graph nodes and handle node positions.
+- Graph Construction: Build a route graph containing paths to monuments.
+- Visualization: Create and save both static map images and KML files of the routes.
+
+##### Key Functions
+
+1. Find Routes:
+
+  - This function generates routes from a starting point to nearby monuments.
+  - It finds the closest node to the starting point, computes the shortest paths, and identifies if any monuments are within these paths.
+  - If monuments are found, it builds a route graph and saves the visualizations as both a static map image and a KML file.
+
+2. Find Closest Node:
+
+  - Finds the closest graph node to a given geographic point using Haversine distance.
+
+3. Haversine Distance:
+
+  - Calculates the Haversine distance between two geographic points, which is essential for determining the closest nodes and edge weights in the graph.
+
+4. Get Monuments Nodes:
+
+  - Maps each monument's location to the closest graph node, returning a set of these nodes.
+
+5. Build Route Graph:
+
+  - Constructs a subgraph containing only the nodes and edges from the shortest paths that lead to the monuments.
+
+6. Save Static Map:
+
+  - Generates and saves a static map image of the route graph, highlighting the start node, monument nodes, and the routes.
+
+7. Save KML:
+
+  - Generates and saves a KML file for visualization in Google Earth, including the nodes and edges of the route graph.
 
 ### Program Architecture
 
