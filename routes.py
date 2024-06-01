@@ -6,8 +6,6 @@ from typing import TypeAlias, Optional
 from staticmap import StaticMap, CircleMarker, Line
 from math import *
 import simplekml
-from geopy.distance import geodesic
-from geopy.point import Point as pt
 
 
 
@@ -25,6 +23,26 @@ def find_routes(graph: Graph, start_point: Point, monuments: Monuments, filename
     else:
         print('No monuments found in the selected box.')
         return -1
+    
+    
+def haversine_distance(point1: Point, point2: Point) -> float:
+    """Calculate the Haversine distance between two points."""
+    # Radius of the Earth in kilometers
+    R = 6371.0
+    lat1, lon1, lat2, lon2 = convert_to_radians(point1, point2)
+    dlat = lat2 - lat1
+    dlon = lon2 - lon1
+
+    a = sin(dlat / 2) ** 2 + cos(lat1) * cos(lat2) * sin(dlon / 2) ** 2
+    c = 2 * atan2(sqrt(a), sqrt(1 - a))
+
+    distance = R * c
+    return distance
+
+
+def convert_to_radians(point1: Point, point2: Point)->tuple[float,float,float,float]:
+    "Convert the latitude and longitude from degrees to radians"
+    return radians(point1.lat), radians(point1.lon), radians(point2.lat), radians(point2.lon)
 
 
 def find_closest_node(graph: Graph, point: Point) -> int:
@@ -33,7 +51,7 @@ def find_closest_node(graph: Graph, point: Point) -> int:
     min_distance = float('inf')
     for node, data in graph.nodes(data=True):
         lat, lon = data['pos'][1], data['pos'][0]
-        distance = geodesic(pt(point.lat, point.lon), pt(lat, lon))
+        distance = haversine_distance(point, Point(lat, lon))
         if distance < min_distance:
             min_distance = distance
             closest_node = node
@@ -76,7 +94,7 @@ def add_nodes_and_edges(G: Graph, route_graph: Graph, path)-> None:
         u, v = path[i], path[i + 1]
         lat1, lon1 = get_node_position(G,u)[0], get_node_position(G,u)[1]
         lat2, lon2 = get_node_position(G,v)[0], get_node_position(G,v)[1]
-        weight = geodesic(pt(lat1, lon1), pt(lat2, lon2))
+        weight = haversine_distance(Point(lat1, lon1), Point(lat2, lon2))
         route_graph.add_edge(u, v, weight=weight)
         route_graph.add_node(u, pos=(lat1,lon1))
         route_graph.add_node(v, pos=(lat2,lon2))
