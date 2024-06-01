@@ -281,7 +281,7 @@ When you start the application, it will guide you through a series of steps to s
 3D Visualization: Generate and save a KML file for 3D visualization in Google Earth.
 
 #### Example Output
-2D Map Example: A PNG image showcasing the map and routes (insert example image if available).
+2D Map Example: A PNG image showcasing the map and routes ![PNG MAP](./images/graf.png)
 
 3D Map Example: A KML file viewable in Google Earth displaying the routes in 3D (insert example image if available).
 
