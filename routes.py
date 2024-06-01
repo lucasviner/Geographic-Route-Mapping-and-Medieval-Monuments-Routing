@@ -6,9 +6,9 @@ from typing import TypeAlias, Optional
 from staticmap import StaticMap, CircleMarker, Line
 from math import *
 import simplekml
+from geopy.distance import geodesic
+from geopy.point import Point as pt
 
-
-Routes: TypeAlias = dict[str, list[int]]
 
 
 def find_routes(graph: Graph, start_point: Point, monuments: Monuments, filename: str) -> int:
@@ -33,29 +33,11 @@ def find_closest_node(graph: Graph, point: Point) -> int:
     min_distance = float('inf')
     for node, data in graph.nodes(data=True):
         lat, lon = data['pos'][1], data['pos'][0]
-        distance = haversine_distance(point, Point(lat, lon))
+        distance = geodesic(pt(point.lat, point.lon), pt(lat, lon))
         if distance < min_distance:
             min_distance = distance
             closest_node = node
     return closest_node
-
-
-def haversine_distance(point1: Point, point2: Point) -> float:
-    """Calculate the Haversine distance between two points."""
-    R = 6371.0  # Radius of the Earth in kilometers
-    lat1, lon1 = convert_to_radians(point1.lat, point1.lon)
-    lat2, lon2 = convert_to_radians(point2.lat, point2.lon)
-    dlat, dlon = lat2 - lat1, lon2 - lon1
-    a = sin(dlat / 2)**2 + cos(lat1) * cos(lat2) * sin(dlon / 2)**2
-    c = 2 * atan2(sqrt(a), sqrt(1 - a))
-    distance = R * c # Distance in kilometers
-    
-    return distance
-
-
-def convert_to_radians(lat: float, lon: float) -> tuple[float, float]:
-    """Convert latitude and longitude from degrees to radians."""
-    return radians(lat), radians(lon)
 
 
 def get_monuments_nodes(G: Graph, monuments: Monuments) -> set[int]:
@@ -94,7 +76,7 @@ def add_nodes_and_edges(G: Graph, route_graph: Graph, path)-> None:
         u, v = path[i], path[i + 1]
         lat1, lon1 = get_node_position(G,u)[0], get_node_position(G,u)[1]
         lat2, lon2 = get_node_position(G,v)[0], get_node_position(G,v)[1]
-        weight = haversine_distance(Point(lat1, lon1), Point(lat2, lon2))
+        weight = geodesic(pt(lat1, lon1), pt(lat2, lon2))
         route_graph.add_edge(u, v, weight=weight)
         route_graph.add_node(u, pos=(lat1,lon1))
         route_graph.add_node(v, pos=(lat2,lon2))
@@ -152,10 +134,3 @@ def add_edges_to_kml(graph: Graph, kml: simplekml.Kml) -> None:
         line = kml.newlinestring(name=f"{u}-{v}", coords=[(pos_u[0], pos_u[1]), (pos_v[0], pos_v[1])])
         line.style.linestyle.color = 'ff000000'  # Black
         line.style.linestyle.width = 2
-
-monuments = get_monuments(Box(Point(40.5363713, 0.5739316671), Point(40.79886535, 0.9021482)),"monuments.dat")
-segments = get_segments(Box(Point(40.5363713, 0.5739316671), Point(40.79886535, 0.9021482)), "segments.dat")
-G = make_graph(segments, 100)
-start_point = Point(lat=40.55, lon=0.6739316671)
-
-find_routes(G, start_point, monuments, 'routes')
