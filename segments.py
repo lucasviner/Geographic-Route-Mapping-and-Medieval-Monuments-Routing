@@ -30,27 +30,36 @@ point: TypeAlias = gpxpy.gpx.GPXTrackPoint
 def download_segments(box: Box, filename: str) -> None:
     """Download all segments in the box and save them to the file."""
     page = 0
+    tries = 0
+    limit_tries = 5
     bbox = f"{box.bottom_left.lon},{box.bottom_left.lat},{box.top_right.lon},{box.top_right.lat}"
     with open(filename, "w") as f:
-        while True:
-            url = f"https://api.openstreetmap.org/api/0.6/trackpoints?bbox={bbox}&page={page}"
-            gpx_content = fetch_gpx_content(url)
-            gpx = gpxpy.parse(gpx_content)
+        while tries < limit_tries:
+            try:
+                url = f"https://api.openstreetmap.org/api/0.6/trackpoints?bbox={bbox}&page={page}"
+                gpx_content = fetch_gpx_content(url)
+                gpx = gpxpy.parse(gpx_content)
 
-            # Break the loop if there are no more tracks to process                            
-            if len(gpx.tracks) == 0:
-                break
+                # Break the loop if there are no more tracks to process                            
+                if len(gpx.tracks) == 0:
+                    break
 
-            for track in gpx.tracks:
-                for segment in track.segments:
-                    if all(point.time is not None for point in segment.points):
-                        segment.points.sort(key=lambda p: p.time)  # type: ignore
-                        for i in range(len(segment.points) - 1):
-                            p1, p2 = segment.points[i], segment.points[i + 1]
-                            if is_valid(p1, p2):
-                                f.write(f"{p1.latitude},{p1.longitude},{p2.latitude},{p2.longitude}\n")
-            page += 1
-
+                for track in gpx.tracks:
+                    for segment in track.segments:
+                        if all(point.time is not None for point in segment.points):
+                            segment.points.sort(key=lambda p: p.time)  # type: ignore
+                            for i in range(len(segment.points) - 1):
+                                p1, p2 = segment.points[i], segment.points[i + 1]
+                                if is_valid(p1, p2):
+                                    f.write(f"{p1.latitude},{p1.longitude},{p2.latitude},{p2.longitude}\n")
+                page += 1
+                tries = 0
+            except Exception as e:
+                print(f"An error occurred while processing the GPX data: {e}")
+                tries += 1
+        if tries == limit_tries:
+            print("You have exceeded the limit of tries to download the GPX content. Check if there are any problems with the server or your connection.")
+            
 
 def fetch_gpx_content(url: str) -> str:        
     """Fetch GPX content from the given URL."""   

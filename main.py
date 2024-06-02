@@ -13,28 +13,31 @@ def main() -> None:
     box = get_user_input_box()
     
     segments = get_segments_in_box(box)
-    print("Downloading segments for the specified region. This may take a few minutes...")
-    
-    print("Creating the graph from the segments...")
-    graph = create_graph(segments)
-    
-    export_option = get_export_option()
-    export_graph(graph, export_option)
-    
-    print("Now, we will download the monuments data from Medieval Catalunya.")
-    filename_monuments = get_filename('monuments')
-    print("Please wait...")
-    get_monuments(box, f'{filename_monuments}.dat')
-    print("Download complete! You can now find optimal routes to nearby monuments within the region.")
-    monuments_of_the_box = load_monuments(box, f'{filename_monuments}.dat')
-    
-    while True:
-        find_optimal_routes(monuments_of_the_box, graph)
-        decision = input("Introduce 'exit' if you would like to exit.\nIntroduce 'restart' if you would like to define a new box.\nIf you want to continue, introduce any character: \n")
-        if decision == "exit": break
-        if decision == "restart": 
-            main() 
-            return
+    if segments:
+        print("Creating the graph from the segments...")
+        graph = create_graph(segments)
+        
+        export_option = get_export_option()
+        export_graph(graph, export_option)
+        
+        print("Now, we will download the monuments data from Medieval Catalunya.")
+        filename_monuments = get_filename('monuments')
+        print("Please wait...")
+        get_monuments(box, f'{filename_monuments}.dat')
+        print("Download complete! You can now find optimal routes to nearby monuments within the region.")
+        monuments_of_the_box = load_monuments(box, f'{filename_monuments}.dat')
+        
+        while True:
+            find_optimal_routes(monuments_of_the_box, graph)
+            decision = input("Introduce 'exit' if you would like to exit.\nIntroduce 'restart' if you would like to define a new box.\nIf you want to continue, introduce any character: \n")
+            if decision == "exit": break
+            if decision == "restart": 
+                main() 
+                return
+    else:
+        print("No segments downloaded. Try again with another box!")
+        main()
+        return
 
 
 def introduction() -> None:
@@ -70,6 +73,7 @@ def get_filename(information: str) -> str:
 def get_segments_in_box(box: Box) -> Segments:
     """Get the segments within the specified box."""
     filename_segments = get_filename('segments')
+    print("Downloading segments for the specified region. This may take a few minutes...")
     return get_segments(box, f'{filename_segments}.dat')
 
 
