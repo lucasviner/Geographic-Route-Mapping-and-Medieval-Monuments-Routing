@@ -1,17 +1,17 @@
 # Pràctica GCED-AP2 2024 · Rutes i monuments
 
-FALTA: ARQUITECTURA DEL PROGRAMA, AFEGIR FOTOS A LA PART FINAL COM A EXEMPLES, EXPLICAR DECISIONS DE DISSENY QUE HAGUEM FET. 
+FALTA: ARQUITECTURA DEL PROGRAMA, EXPLICAR DECISIONS DE DISSENY QUE HAGUEM FET. 
 
 ## Geographic Route Mapping and Medieval Monuments Routing
 
 ### Project Description
 
-This project allows users to process geographic data, obtain hiking routes within a specified region, infer a map (graph) based on these routes, and find optimal paths to medieval monuments. The results can be visualized in both 2D and 3D formats. Users can export the generated maps in .png and .kml formats and interactively find optimal routes to various points of interest.
+This project allows users to process geographic data, obtain hiking routes within a specified region, infer a map (graph) based on these routes, and find optimal paths to medieval monuments. The results can be visualized in both 2D and 3D formats. Users can export the generated maps in .png and .kml formats and interactively find optimal routes to various monuments of interest.
 
 ### Table of Contents
-1. [Getting Started](#getting-started)
-2. [What each program does](#what-each-program-does)
-3. [Program Architecture](#Program-Architecture)
+1. [What each program does](#what-each-program-does)
+2. [Program Architecture](#Program-Architecture)
+3. [Getting Started](#getting-started)
 4. [Prerequisites](#prerequisites)
 5. [Installing](#installing)
 6. [Running the Tests](#running-the-tests)
@@ -19,9 +19,6 @@ This project allows users to process geographic data, obtain hiking routes withi
 8. [Example Workflow](#example-workflow)
 9. [Authors](#authors)
 
-### Getting Started
-
-These instructions will get you a copy of the project up and running on your local machine for development and testing. 
 
 ### What each program does
 
@@ -212,6 +209,10 @@ This script is designed to generate routes for the Medieval Routes Project, conn
 
 ### Program Architecture
 
+### Getting Started
+
+These instructions will get you a copy of the project up and running on your local machine for development and testing. 
+
 ### Prerequisites
 
 What things you need to install the software and how to install them:
@@ -281,9 +282,27 @@ When you start the application, it will guide you through a series of steps to s
 3D Visualization: Generate and save a KML file for 3D visualization in Google Earth.
 
 #### Example Output
-2D Map Example: A PNG image showcasing the map and routes (insert example image if available).
+2D Map Example: A PNG image showcasing the map and routes 
 
-3D Map Example: A KML file viewable in Google Earth displaying the routes in 3D (insert example image if available).
+- Example of the graph with the segments
+  
+![EXAMPLE_GRAPH](https://github.com/lucasviner/practica2-AP2/assets/101245656/f4a98ff0-e84b-4691-b1ed-98ca6d85973c)
+
+- Example of the graph with the optimal routes from an initial point to all the nearby monuments
+  
+![EXAMPLE_ROUTES](https://github.com/lucasviner/practica2-AP2/assets/101245656/97665dae-d7e5-48bb-8fe8-712d2ebb8b0e)
+
+3D Map Example: A KML file viewable in Google Earth displaying the routes in 3D 
+
+- Example of the graph with the segments
+  
+![image](https://github.com/lucasviner/practica2-AP2/assets/101245656/c5d291d7-b4a1-473c-ac5a-28b53578ec87)
+
+- Example of the graph with some routes(indicated in black) to get to the nearby monuments(red points) strarting from an initial point(green point)
+
+![image](https://github.com/lucasviner/practica2-AP2/assets/101245656/5593d30d-24c4-496c-b5c2-93f99423cb59)
+
+
 
 By following these steps, users can interactively explore hiking routes and find optimal paths to medieval monuments within their region of interest.
 
