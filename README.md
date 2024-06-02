@@ -209,8 +209,12 @@ This script is designed to generate routes for the Medieval Routes Project, conn
 
 ### Program Architecture
 
+The architecture of our program follows this relationship between its modules:
+
 ![ARQUITECTURA](https://github.com/lucasviner/practica2-AP2/assets/167958211/f0fbbfaf-cfe1-4190-a212-e60af8f9ec10)
 
+
+It should be noted that having a dependency on a program has been interpreted as requiring data from it, not merely needing a type initialized in another module.
 
 ### Getting Started
 
