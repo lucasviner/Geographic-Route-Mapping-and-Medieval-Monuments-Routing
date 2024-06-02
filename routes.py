@@ -1,10 +1,10 @@
 import networkx as nx
-from segments import Point, get_segments, Box
-from graphmaker import Graph, make_graph
-from monuments import Monuments, get_monuments
-from typing import TypeAlias, Optional
+from segments import Point
+from graphmaker import Graph
+from monuments import Monuments
+from typing import Optional
 from staticmap import StaticMap, CircleMarker, Line
-from math import *
+from math import sin, cos, atan2, sqrt, radians
 import simplekml
 
 
@@ -46,8 +46,8 @@ def convert_to_radians(point1: Point, point2: Point)->tuple[float,float,float,fl
 
 
 def find_closest_node(graph: Graph, point: Point) -> int:
-    """Find the closest node in the graph to a given point."""
-    closest_node = None
+    """Find the closest node in the graph to a given point. Returns -1 if there isn't any Node close."""
+    closest_node = -1
     min_distance = float('inf')
     for node, data in graph.nodes(data=True):
         lat, lon = data['pos'][1], data['pos'][0]
@@ -90,16 +90,18 @@ def build_route_graph(G: Graph, monument_nodes: set, shortest_paths) -> Graph:
 
 
 def add_nodes_and_edges(G: Graph, route_graph: Graph, path)-> None:
+    """Add nodes and edges to the route graph."""
     for i in range(len(path) - 1):
         u, v = path[i], path[i + 1]
-        lat1, lon1 = get_node_position(G,u)[0], get_node_position(G,u)[1]
-        lat2, lon2 = get_node_position(G,v)[0], get_node_position(G,v)[1]
-        weight = haversine_distance(Point(lat1, lon1), Point(lat2, lon2))
-        route_graph.add_edge(u, v, weight=weight)
-        route_graph.add_node(u, pos=(lat1,lon1))
-        route_graph.add_node(v, pos=(lat2,lon2))
+        pos_u, pos_v = get_node_position(G,u), get_node_position(G,v)
+        if pos_u and pos_v:
+            lat1, lon1 = pos_u
+            lat2, lon2 = pos_v
+            weight = haversine_distance(Point(lat1, lon1), Point(lat2, lon2))
+            route_graph.add_edge(u, v, weight=weight)
+            route_graph.add_node(u, pos=(lat1,lon1))
+            route_graph.add_node(v, pos=(lat2,lon2))
         
-    return route_graph
 
 def save_static_map(G: Graph, start_node: int, monument_nodes: set[int], filename: str) -> None:
     """Generate and save a static map image."""
