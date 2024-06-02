@@ -14,9 +14,9 @@ This project allows users to process geographic data, obtain hiking routes withi
 3. [Getting Started](#getting-started)
 4. [Prerequisites](#prerequisites)
 5. [Installing](#installing)
-6. [Running the Tests](#running-the-tests)
 7. [Built With](#built-with)
 8. [Example Workflow](#example-workflow)
+6. [User Guide](#User-Guide)  
 9. [Authors](#authors)
 
 
@@ -235,14 +235,6 @@ A step-by-step series of examples that tell you how to get a development environ
 
 3. Follow the on-screen instructions to input the coordinates and generate maps.
 
-### Running the Tests
-
-#### Unit Tests:
-```bash
-python -m unittest discover tests
-```
-These tests simulate user interactions and verify that the system behaves as expected from start to finish.
-
 ### Built with
 - Python - The programming language used
 - NetworkX - Used for creating and manipulating complex networks/graphs
@@ -305,6 +297,138 @@ When you start the application, it will guide you through a series of steps to s
 
 
 By following these steps, users can interactively explore hiking routes and find optimal paths to medieval monuments within their region of interest.
+
+### User Guide
+
+
+#### Running the Script
+To run the main script main.py, open a terminal in the project directory and execute:
+
+``` bash
+python main.py
+```
+
+#### Step-by-Step Guide
+
+- Introduction:
+  
+At the start of the script, you will see a welcome message that describes the project's objectives.
+
+- Entering Coordinates:
+  
+You will be prompted to enter the coordinates of the region you want to process.
+
+Latitude of the bottom left corner: Enter the latitude of the bottom left point of the box.
+
+Longitude of the bottom left corner: Enter the longitude of the bottom left point of the box.
+
+Latitude of the top right corner: Enter the latitude of the top right point of the box.
+
+Longitude of the top right corner: Enter the longitude of the top right point of the box.
+
+Example:
+
+``` bash
+Enter the latitude of the bottom left corner: 40.5363713
+Enter the longitude of the bottom left corner: 0.5739316671
+Enter the latitude of the top right corner: 40.79886535
+Enter the longitude of the top right corner: 0.9021482
+```
+
+- Downloading Segments:
+The script will download the segments within the specified box. This may take a few minutes.
+
+- Creating the Graph:
+You will be prompted to enter the number of clusters to create the graph. Enter an integer.
+
+- Exporting the Graph:
+You will be asked how you would like to export the graph:
+
+1: Export to a .png file.
+
+2: Export to a .kml file.
+
+3: Export to both .png and .kml files.
+
+4: Do not export.
+
+- Downloading Monuments:
+The script will download the medieval monument data from Medieval Catalunya. Please wait while the download completes.
+
+- Calculating Optimal Routes:
+
+You will be prompted to enter an initial point to find optimal routes to nearby monuments.
+
+Latitude: Enter the latitude of the initial point.
+Longitude: Enter the longitude of the initial point.
+
+Example:
+
+``` bash
+Latitude: 40.65
+Longitude: 0.75
+```
+
+- Continuation Options:
+
+Enter exit to exit.
+
+Enter restart to define a new box.
+
+Enter any other character to continue.
+
+#### Complete Execution Example
+
+Here is an example of what a complete session might look like:
+
+``` python
+Welcome to the Medieval Routes Project!
+In this project, you will be able to:
+1. Obtain hiker routes in a geographic region.
+2. Infer a map (a graph) from the routes.
+3. Obtain coordinates of medieval monuments.
+4. Find optimal routes to medieval monuments in the inferred graph.
+5. Visualize the resulting maps in 2D and 3D.
+
+Let's get started!
+Please enter the coordinates of the region you would like to process:
+Enter the latitude of the bottom left corner: 40.5363713
+Enter the longitude of the bottom left corner: 0.5739316671
+Enter the latitude of the top right corner: 40.79886535
+Enter the longitude of the top right corner: 0.9021482
+Downloading segments for the specified region. This may take a few minutes...
+Creating the graph from the segments...
+Please, indicate the number of clusters:
+5
+Choose an option for exporting the graph routes:
+1) --> Export to .png file
+2) --> Export to .kml file
+3) --> Export to both .png and .kml files
+4) --> Do not export
+2
+Indicate the name of the file where you would like to save the graph.kml. If the name of the file is the same as any other existing file, we will only consider the file already created.
+my_graph
+Graph routes exported to my_graph.kml
+Now, we will download the monuments data from Medieval Catalunya.
+Indicate the name of the file where you would like to save the monuments. If the name of the file is the same as any other existing file, we will only consider the file already created.
+monuments_data
+Please wait...
+Download complete! You can now find optimal routes to nearby monuments within the region.
+Enter an initial point to find optimal routes to all nearby monuments within the region:
+Latitude: 40.65
+Longitude: 0.75
+Indicate the name of the file where you would like to save the routes. If the name of the file is the same as any other existing file, we will only consider the file already created.
+optimal_routes
+Calculating optimal routes from (40.65, 0.75) to nearby monuments...
+Done! To watch the results, look at the optimal_routes documents (.png and .kml)
+Introduce 'exit' if you would like to exit.
+Introduce 'restart' if you would like to define a new box.
+If you want to continue, introduce any character: 
+```
+
+#### Contact
+
+If you have any questions or need assistance, feel free to contact the Medieval Routes Project support team.
 
 ### Authors
 Lucas Federico Viner & Oriol Parent
