@@ -209,6 +209,9 @@ This script is designed to generate routes for the Medieval Routes Project, conn
 
 ### Program Architecture
 
+![ARQUITECTURA](https://github.com/lucasviner/practica2-AP2/assets/167958211/f0fbbfaf-cfe1-4190-a212-e60af8f9ec10)
+
+
 ### Getting Started
 
 These instructions will get you a copy of the project up and running on your local machine for development and testing. 
