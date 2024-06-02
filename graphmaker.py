@@ -91,7 +91,7 @@ def extract_edges_from_matrix(adjacency_matrix: Matrix, max_cluster: int) -> Edg
 
 def remove_nodes_with_no_edges(graph: Graph) -> None:
     """Remove nodes from the graph that have no edges."""
-    nodes_to_remove = [node for node, degree in graph.nodes() if degree == 0]
+    nodes_to_remove = [node for node in graph.nodes() if graph.degree[node] == 0]
     graph.remove_nodes_from(nodes_to_remove)
 
 

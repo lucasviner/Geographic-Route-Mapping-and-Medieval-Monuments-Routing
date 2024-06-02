@@ -64,7 +64,7 @@ def get_user_input_box() -> Box:
 
 def get_filename(information: str) -> str:
     """Asks the user for the name of the file where the information will be saved. """
-    return input(f"Indicate the name of the file where you would like to save the {information}. Take into account that if the name of the file is the same as any other existing file, we will only take into account the file arleady created.\n")
+    return input(f"Indicate the name of the file where you would like to save the {information}. If the name of the file is the same as any other existing file, we will only consider the file already created.\n")
 
 
 def get_segments_in_box(box: Box) -> Segments:
@@ -76,7 +76,7 @@ def get_segments_in_box(box: Box) -> Segments:
 def create_graph(segments: Segments) -> Graph:
     """Create a graph from the given segments."""
     while True:
-        print("Please, indicate the number of clusters:\n")
+        print("Please, indicate the number of clusters:")
         try:
             num_clusters = read(int)
             return make_graph(segments, num_clusters)
