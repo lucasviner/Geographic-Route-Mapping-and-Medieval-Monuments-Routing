@@ -1,7 +1,5 @@
 # Pràctica GCED-AP2 2024 · Rutes i monuments
 
-FALTA:EXPLICAR DECISIONS DE DISSENY QUE HAGUEM FET. 
-
 ## Geographic Route Mapping and Medieval Monuments Routing
 
 ### Project Description
@@ -42,6 +40,14 @@ The main program serves as the main entry point for the Medieval Routes Project.
 - Export Options: The user can choose to export the graph to PNG, KML, or both formats.
 - Download Monuments Data: Data about medieval monuments in the region is fetched.
 - Find Optimal Routes: The user can find and export the optimal routes from a specified starting point to the monuments.
+
+##### Design decisions
+- Si hi ha una llista de segments que s'intenta descarregar i falla et retorna a l'inici del programa per tal de que li passis unes noves coordenades.
+- Si les cordenades no segueixen el tipus correcte et retornara a la mateixa posició a la que estaves a l'inici per tal de que escriguis unes noves coordenades. 
+- Si el nombre de clusters amb el qual vols construir el graf no és del tipus indicat et retorna un error i et demana un nombre del tipus correcte.
+- En el moment d'exportar el graf si no s'indica un dels valors indicats retornaràs a l'inici d'aquell pas i s'et demanarà un valor dels indicats novament.
+- Al buscar les rutes les cordenades del punt inicial han d'estar en el format indicat, si no es el cas es retornaria un error i es demanarien unes noves coordenades.  
+- Pots executar el programa tantes vegades seguides com vulguis escribint "restart" al finalitzar cada intent. Si vols finalitzar el programa escriu exit al acabar d'executar-lo. 
   
 #### Segments
 This script is designed to handle segment processing and visualization for the Medieval Routes Project. It provides functionality to download segments within a specified bounding box from OpenStreetMap, validate and save these segments, load segments from a file, and visualize them using a static map.
@@ -57,17 +63,29 @@ This script is designed to handle segment processing and visualization for the M
 1. Download Segments
   - This function downloads all segments within the specified bounding box from OpenStreetMap and saves them to a file.
 
+  ##### Design decisions
+  - Les dades que es tenen en compte son les que passen per la funció que valida les dades. 
+
 2. Validate Segments
   - Ensures segments meet specified criteria, such as the year of data(need to be newer than the limit year) and distance between points(need to be closer than 0.1km).
 
+  ##### Design decisions
+  - Les dades que son tractades son les dades que tenen una distància i una antiguetat que es consideren acceptables.
+
 3. Load Segments
   - Reads segments from a file into a list of segment objects.
+  
+  ##### Design desicions
+  - Si una de les linies que lleigeix es incorrecte el que fa és retornar un missatge d'error, i passar a la següent línia. 
     
 4. Get Segments
   -  Depending on the existence of a file, either load segments from it or download them if the file does not exist.
     
 5. View Segments
   - Creates a static map image of the segments and saves it as a PNG file.
+  ##### Design decisions
+  - La mida dels segments en aquest graf es 2.
+  - El color dels segments es el negre.
     
 #### Monuments
 This script is designed to handle monument processing for the Medieval Routes Project. It provides functionality to download monument data from a website, parse and save this data, load monuments from a file, and filter monuments based on a specified bounding box.
@@ -87,6 +105,8 @@ This script is designed to handle monument processing for the Medieval Routes Pr
 2. Fetch Page Content
    
   - Fetches the content of a web page, with retry logic in case of request failures.
+  ##### Design decisions
+  - En el cas de que la descarrega dels monuments trigui mes del temps indicat en la funció es mostrarà un missatge d'error i es reintentarà la descarrega, això amb un nomnbre màxim de repeticions de 10. 
     
 3. Extract Script Tag
 
@@ -100,6 +120,9 @@ This script is designed to handle monument processing for the Medieval Routes Pr
 
   - Loads monument data from a file and filters monuments based on their location within a specified bounding box.
   - Reads the file line by line, extracts monument data, and checks if each monument is within the given bounding box.
+  ##### Design decisions
+  - Si una de les linies que lleigeix es incorrecte el que fa és retornar un missatge d'error, i passar a la següent línia. 
+    
 
 6. Get Monuments:
    
@@ -124,6 +147,10 @@ The GraphMaker program is designed to create and simplify a graph based on geogr
   - Performs clustering
   - Builds the initial graph
   - Simplifies the graph.
+
+  ##### Design decisions
+  - El graph no afeigeix sempre una aresta en el cas d'existir una ruta entre dos clusters sinó que es considera que n'hi ha d'haver un mínim de dues. 
+  - El graf només afeigeix els nodes que tinguin un node connectat a ells, sinó el descarta. 
 
 2. simplify_graph
   - Simplifies the graph by removing nodes with exactly two edges if the angle between the edges is near 180 degrees.
@@ -150,10 +177,18 @@ This script is designed to handle the visualization of graphs for the Medieval R
   - Adds the edges of the graph to a static map as lines.
   - Each edge is represented by a black line with a specified width.
 
+  ##### Design decisions
+  - L'amplada de les arestes és de 2.
+  - El color de les arestes és el negre.
+
 3. Add Nodes to Static Map:
 
   - Adds the nodes of the graph to a static map as circle markers.
   - Each node is represented by a blue circle with a specified width.
+
+  ##### Design decisions
+  - L'amplada dels nodes és de 7.
+  - El color dels nodes és el blau.
 
 4. Export KML:
 
@@ -192,6 +227,9 @@ This script is designed to generate routes for the Medieval Routes Project, conn
   - This function generates routes from a starting point to nearby monuments.
   - It finds the closest node to the starting point, computes the shortest paths, and identifies if any monuments are within these paths.
   - If monuments are found, it builds a route graph and saves the visualizations as both a static map image and a KML file.
+  
+  ##### Design decision
+  - Si la llista de monuments es buida la funció mostra un text per pantalla indicant que no hi ha cap monument a la box seleccionada. 
 
 2. Find Closest Node:
 
@@ -200,6 +238,9 @@ This script is designed to generate routes for the Medieval Routes Project, conn
 3. Haversine Distance:
 
   - Calculates the Haversine distance between two geographic points, which is essential for determining the closest nodes and edge weights in the graph.
+
+  ##### Design decisions
+  - Sabem de l'existencia de que el modul haversine te una funció ja implementada que executa aquest codi, però aquesta ens dona un error de tipus que no sabem com solucionar. 
 
 4. Get Monuments Nodes:
 
@@ -213,9 +254,19 @@ This script is designed to generate routes for the Medieval Routes Project, conn
 
   - Generates and saves a static map image of the route graph, highlighting the start node, monument nodes, and the routes.
 
+  ##### Design decisions
+  - El node inici de la ruta té una mida de 30 i de color verd.
+  - Els nodes que tenen un monument associat són de mida 30 i de color vermell.
+  - La resta de nodes son de mida 10 i de color blau. 
+
 7. Save KML:
 
   - Generates and saves a KML file for visualization in Google Earth, including the nodes and edges of the route graph.
+
+  ##### Design decisions
+  - El node inici de la ruta té una mida de 30 i de color verd.
+  - Els nodes que tenen un monument associat són de mida 30 i de color vermell.
+  - La resta de nodes son de mida 10 i de color blau. 
 
 ### Getting Started
 
