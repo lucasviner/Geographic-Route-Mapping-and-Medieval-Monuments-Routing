@@ -16,7 +16,7 @@ This project allows users to process geographic data, obtain hiking routes withi
 5. [Installing](#installing)
 7. [Built With](#built-with)
 8. [Example Workflow](#example-workflow)
-6. [User Guide](#User-Guide)  
+6. [Step-by-Step User Guide](#Step-by-Step_User-Guide)  
 9. [Authors](#authors)
 
 
@@ -298,7 +298,7 @@ When you start the application, it will guide you through a series of steps to s
 
 By following these steps, users can interactively explore hiking routes and find optimal paths to medieval monuments within their region of interest.
 
-### User Guide
+### Step-by-Step User Guide
 
 
 #### Running the Script
@@ -307,9 +307,7 @@ To run the main script main.py, open a terminal in the project directory and exe
 ``` bash
 python main.py
 ```
-
 #### Step-by-Step Guide
-
 - Introduction:
   
 At the start of the script, you will see a welcome message that describes the project's objectives.
