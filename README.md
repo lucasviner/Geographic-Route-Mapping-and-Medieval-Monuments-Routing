@@ -47,7 +47,7 @@ The main program serves as the main entry point for the Medieval Routes Project.
 - Si el nombre de clusters amb el qual vols construir el graf no és del tipus indicat et retorna un error i et demana un nombre del tipus correcte.
 - En el moment d'exportar el graf si no s'indica un dels valors indicats retornaràs a l'inici d'aquell pas i s'et demanarà un valor dels indicats novament.
 - Al buscar les rutes les cordenades del punt inicial han d'estar en el format indicat, si no es el cas es retornaria un error i es demanarien unes noves coordenades.  
-- Pots executar el programa tantes vegades seguides com vulguis escribint "restart" al finalitzar cada intent. Si vols finalitzar el programa escriu exit al acabar d'executar-lo. 
+- Pots executar el programa tantes vegades seguides com vulguis amb una box diferent escribint "restart" al finalitzar cada intent per tal de buscar rutes en noves zones. Si vols finalitzar el programa escriu exit al acabar d'executar-lo. Si introdueixes qualsevol altre caracter podràs donar un nou punt desde el qual buscar les rutes.  
   
 #### Segments
 This script is designed to handle segment processing and visualization for the Medieval Routes Project. It provides functionality to download segments within a specified bounding box from OpenStreetMap, validate and save these segments, load segments from a file, and visualize them using a static map.
@@ -76,7 +76,7 @@ This script is designed to handle segment processing and visualization for the M
   - Reads segments from a file into a list of segment objects.
   
   ##### Design desicions
-  - Si una de les linies que lleigeix es incorrecte el que fa és retornar un missatge d'error, i passar a la següent línia. 
+  - Si una de les linies que lleigeix no està en el format incicat el que fa és retornar un missatge d'error, i passar a la següent línia. 
     
 4. Get Segments
   -  Depending on the existence of a file, either load segments from it or download them if the file does not exist.
@@ -106,7 +106,7 @@ This script is designed to handle monument processing for the Medieval Routes Pr
    
   - Fetches the content of a web page, with retry logic in case of request failures.
   ##### Design decisions
-  - En el cas de que la descarrega dels monuments trigui mes del temps indicat en la funció es mostrarà un missatge d'error i es reintentarà la descarrega, això amb un nomnbre màxim de repeticions de 10. 
+  - En el cas de que la descarrega dels monuments trigui mes del temps indicat, o hi hagi un error en la connexió amb la pàgina de descarrega, la funció  mostrarà un missatge d'error i es reintentarà la descarrega, això amb un nomnbre màxim de repeticions de 10. 
     
 3. Extract Script Tag
 
@@ -121,9 +121,8 @@ This script is designed to handle monument processing for the Medieval Routes Pr
   - Loads monument data from a file and filters monuments based on their location within a specified bounding box.
   - Reads the file line by line, extracts monument data, and checks if each monument is within the given bounding box.
   ##### Design decisions
-  - Si una de les linies que lleigeix es incorrecte el que fa és retornar un missatge d'error, i passar a la següent línia. 
+  - Si una de les linies que lleigeix no està en el format incicat el que fa és retornar un missatge d'error, i passar a la següent línia. 
     
-
 6. Get Monuments:
    
   - Retrieves all monuments within a specified bounding box.
@@ -149,7 +148,7 @@ The GraphMaker program is designed to create and simplify a graph based on geogr
   - Simplifies the graph.
 
   ##### Design decisions
-  - El graph no afeigeix sempre una aresta en el cas d'existir una ruta entre dos clusters sinó que es considera que n'hi ha d'haver un mínim de dues. 
+  - Les arestes son afegides al graf segons si existeixen camins entre dos punts asociats a nodes diferents, en el cas d'aquest programa es demana que hi hagi un mínim de dos camins entre els nodes per tal d'afegir l'aresta.
   - El graf només afeigeix els nodes que tinguin un node connectat a ells, sinó el descarta. 
 
 2. simplify_graph
@@ -227,7 +226,7 @@ This script is designed to generate routes for the Medieval Routes Project, conn
   - This function generates routes from a starting point to nearby monuments.
   - It finds the closest node to the starting point, computes the shortest paths, and identifies if any monuments are within these paths.
   - If monuments are found, it builds a route graph and saves the visualizations as both a static map image and a KML file.
-  
+
   ##### Design decision
   - Si la llista de monuments es buida la funció mostra un text per pantalla indicant que no hi ha cap monument a la box seleccionada. 
 
@@ -240,7 +239,7 @@ This script is designed to generate routes for the Medieval Routes Project, conn
   - Calculates the Haversine distance between two geographic points, which is essential for determining the closest nodes and edge weights in the graph.
 
   ##### Design decisions
-  - Sabem de l'existencia de que el modul haversine te una funció ja implementada que executa aquest codi, però aquesta ens dona un error de tipus que no sabem com solucionar. 
+  - Sabem de l'existencia de que el modul haversine te una funció ja implementada que executa aquest codi, però aquesta ens dona un error al intentar recorrer les tuples de punts no sabem com solucionar. 
 
 4. Get Monuments Nodes:
 
