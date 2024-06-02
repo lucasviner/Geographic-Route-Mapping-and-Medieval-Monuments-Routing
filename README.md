@@ -1,6 +1,6 @@
 # Pràctica GCED-AP2 2024 · Rutes i monuments
 
-FALTA: ARQUITECTURA DEL PROGRAMA, EXPLICAR DECISIONS DE DISSENY QUE HAGUEM FET. 
+FALTA:EXPLICAR DECISIONS DE DISSENY QUE HAGUEM FET. 
 
 ## Geographic Route Mapping and Medieval Monuments Routing
 
