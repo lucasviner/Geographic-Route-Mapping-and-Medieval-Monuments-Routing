@@ -42,12 +42,12 @@ The main program serves as the main entry point for the Medieval Routes Project.
 - Find Optimal Routes: The user can find and export the optimal routes from a specified starting point to the monuments.
 
 ##### Design decisions
-- Si hi ha una llista de segments que s'intenta descarregar i falla et retorna a l'inici del programa per tal de que li passis unes noves coordenades.
-- Si les cordenades no segueixen el tipus correcte et retornara a la mateixa posició a la que estaves a l'inici per tal de que escriguis unes noves coordenades. 
-- Si el nombre de clusters amb el qual vols construir el graf no és del tipus indicat et retorna un error i et demana un nombre del tipus correcte.
-- En el moment d'exportar el graf si no s'indica un dels valors indicats retornaràs a l'inici d'aquell pas i s'et demanarà un valor dels indicats novament.
-- Al buscar les rutes les cordenades del punt inicial han d'estar en el format indicat, si no es el cas es retornaria un error i es demanarien unes noves coordenades.  
-- Pots executar el programa tantes vegades seguides com vulguis amb una box diferent escribint "restart" al finalitzar cada intent per tal de buscar rutes en noves zones. Si vols finalitzar el programa escriu exit al acabar d'executar-lo. Si introdueixes qualsevol altre caracter podràs donar un nou punt desde el qual buscar les rutes.  
+- If there is a list of segments that fails to download, it will return to the beginning of the program so you can provide new coordinates.
+- If the coordinates do not follow the correct type, it will return to the same position as at the beginning for you to enter new coordinates.
+- If the number of clusters with which you want to build the graph is not of the indicated type, it will return an error and ask for a number of the correct type.
+- When exporting the graph, if one of the indicated values is not specified, it will return to the beginning of that step and ask for one of the indicated values again.
+- When searching for routes, the coordinates of the starting point must be in the indicated format; if not, it will return an error and ask for new coordinates.
+- You can run the program as many times in a row as you want with a different box by typing "restart" at the end of each attempt to search for routes in new areas. If you want to end the program, type "exit" after completing the execution. If you enter any other character, you will be able to provide a new point from which to search for routes.
   
 #### Segments
 This script is designed to handle segment processing and visualization for the Medieval Routes Project. It provides functionality to download segments within a specified bounding box from OpenStreetMap, validate and save these segments, load segments from a file, and visualize them using a static map.
@@ -64,19 +64,19 @@ This script is designed to handle segment processing and visualization for the M
   - This function downloads all segments within the specified bounding box from OpenStreetMap and saves them to a file.
 
   ##### Design decisions
-  - Les dades que es tenen en compte son les que passen per la funció que valida les dades. 
+  - The data that is taken into account is the data that passes through the function that validates the data.
 
 2. Validate Segments
   - Ensures segments meet specified criteria, such as the year of data(need to be newer than the limit year) and distance between points(need to be closer than 0.1km).
 
   ##### Design decisions
-  - Les dades que son tractades son les dades que tenen una distància i una antiguetat que es consideren acceptables.
+  - The data that is processed is the data that has a distance and an age that are considered acceptable.
 
 3. Load Segments
   - Reads segments from a file into a list of segment objects.
   
   ##### Design desicions
-  - Si una de les linies que lleigeix no està en el format incicat el que fa és retornar un missatge d'error, i passar a la següent línia. 
+  - If one of the lines being read is not in the indicated format, it will return an error message and move to the next line. 
     
 4. Get Segments
   -  Depending on the existence of a file, either load segments from it or download them if the file does not exist.
@@ -84,8 +84,8 @@ This script is designed to handle segment processing and visualization for the M
 5. View Segments
   - Creates a static map image of the segments and saves it as a PNG file.
   ##### Design decisions
-  - La mida dels segments en aquest graf es 2.
-  - El color dels segments es el negre.
+  - The size of the segments in this graph is 2.
+  - The color of the segments is black.
     
 #### Monuments
 This script is designed to handle monument processing for the Medieval Routes Project. It provides functionality to download monument data from a website, parse and save this data, load monuments from a file, and filter monuments based on a specified bounding box.
@@ -106,7 +106,7 @@ This script is designed to handle monument processing for the Medieval Routes Pr
    
   - Fetches the content of a web page, with retry logic in case of request failures.
   ##### Design decisions
-  - En el cas de que la descarrega dels monuments trigui mes del temps indicat, o hi hagi un error en la connexió amb la pàgina de descarrega, la funció  mostrarà un missatge d'error i es reintentarà la descarrega, això amb un nomnbre màxim de repeticions de 10. 
+  - In the event that downloading the monuments takes longer than the indicated time, or there is a connection error with the download page, the function will display an error message and retry the download, with a maximum number of 10 retries. 
     
 3. Extract Script Tag
 
@@ -121,7 +121,7 @@ This script is designed to handle monument processing for the Medieval Routes Pr
   - Loads monument data from a file and filters monuments based on their location within a specified bounding box.
   - Reads the file line by line, extracts monument data, and checks if each monument is within the given bounding box.
   ##### Design decisions
-  - Si una de les linies que lleigeix no està en el format incicat el que fa és retornar un missatge d'error, i passar a la següent línia. 
+  - If one of the lines being read is not in the indicated format, it will return an error message and move on to the next line.
     
 6. Get Monuments:
    
@@ -148,8 +148,8 @@ The GraphMaker program is designed to create and simplify a graph based on geogr
   - Simplifies the graph.
 
   ##### Design decisions
-  - Les arestes son afegides al graf segons si existeixen camins entre dos punts asociats a nodes diferents, en el cas d'aquest programa es demana que hi hagi un mínim de dos camins entre els nodes per tal d'afegir l'aresta.
-  - El graf només afeigeix els nodes que tinguin un node connectat a ells, sinó el descarta. 
+  - Edges are added to the graph if there are paths between two points associated with different nodes. In this program, it is required that there be a minimum of two paths between the nodes to add the edge.
+  - The graph only adds nodes that have a node connected to them; otherwise, it discards them.
 
 2. simplify_graph
   - Simplifies the graph by removing nodes with exactly two edges if the angle between the edges is near 180 degrees.
@@ -177,8 +177,8 @@ This script is designed to handle the visualization of graphs for the Medieval R
   - Each edge is represented by a black line with a specified width.
 
   ##### Design decisions
-  - L'amplada de les arestes és de 2.
-  - El color de les arestes és el negre.
+  - The width of the edges is 2.
+  - The color of the edges is black.
 
 3. Add Nodes to Static Map:
 
@@ -186,8 +186,8 @@ This script is designed to handle the visualization of graphs for the Medieval R
   - Each node is represented by a blue circle with a specified width.
 
   ##### Design decisions
-  - L'amplada dels nodes és de 7.
-  - El color dels nodes és el blau.
+  - The width of the nodes is 7.
+  - The color of the nodes is blue.
 
 4. Export KML:
 
@@ -228,7 +228,7 @@ This script is designed to generate routes for the Medieval Routes Project, conn
   - If monuments are found, it builds a route graph and saves the visualizations as both a static map image and a KML file.
 
   ##### Design decision
-  - Si la llista de monuments es buida la funció mostra un text per pantalla indicant que no hi ha cap monument a la box seleccionada. 
+  - If the list of monuments is empty, the function displays a message indicating that there are no monuments in the selected box. 
 
 2. Find Closest Node:
 
@@ -239,7 +239,7 @@ This script is designed to generate routes for the Medieval Routes Project, conn
   - Calculates the Haversine distance between two geographic points, which is essential for determining the closest nodes and edge weights in the graph.
 
   ##### Design decisions
-  - Sabem de l'existencia de que el modul haversine te una funció ja implementada que executa aquest codi, però aquesta ens dona un error al intentar recorrer les tuples de punts no sabem com solucionar. 
+  - We are aware that the Haversine module has a pre-implemented function that executes this code, but it gives us an error when trying to iterate over the tuples of points. We don't know how to solve it.
 
 4. Get Monuments Nodes:
 
@@ -254,18 +254,18 @@ This script is designed to generate routes for the Medieval Routes Project, conn
   - Generates and saves a static map image of the route graph, highlighting the start node, monument nodes, and the routes.
 
   ##### Design decisions
-  - El node inici de la ruta té una mida de 30 i de color verd.
-  - Els nodes que tenen un monument associat són de mida 30 i de color vermell.
-  - La resta de nodes son de mida 10 i de color blau. 
+  - The starting node of the route has a size of 30 and a green color.
+  - Nodes that have an associated monument are sized 30 and colored red.
+  - The rest of the nodes are sized 10 and colored blue.
 
 7. Save KML:
 
   - Generates and saves a KML file for visualization in Google Earth, including the nodes and edges of the route graph.
 
   ##### Design decisions
-  - El node inici de la ruta té una mida de 30 i de color verd.
-  - Els nodes que tenen un monument associat són de mida 30 i de color vermell.
-  - La resta de nodes son de mida 10 i de color blau. 
+  - The starting node of the route has a size of 30 and a green color.
+  - Nodes that have an associated monument are sized 30 and colored red.
+  - The rest of the nodes are sized 10 and colored blue.
 
 ### Getting Started
 
