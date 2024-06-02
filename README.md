@@ -9,8 +9,8 @@ FALTA:EXPLICAR DECISIONS DE DISSENY QUE HAGUEM FET.
 This project allows users to process geographic data, obtain hiking routes within a specified region, infer a map (graph) based on these routes, and find optimal paths to medieval monuments. The results can be visualized in both 2D and 3D formats. Users can export the generated maps in .png and .kml formats and interactively find optimal routes to various monuments of interest.
 
 ### Table of Contents
-1. [What each program does](#what-each-program-does)
-2. [Program Architecture](#Program-Architecture)
+1. [Program Architecture](#Program-Architecture)
+2. [What each program does](#what-each-program-does)
 3. [Getting Started](#getting-started)
 4. [Prerequisites](#prerequisites)
 5. [Installing](#installing)
@@ -18,6 +18,16 @@ This project allows users to process geographic data, obtain hiking routes withi
 8. [Example Workflow](#example-workflow)
 6. [Step-by-Step User Guide](#Step-by-Step_User-Guide)  
 9. [Authors](#authors)
+
+
+### Program Architecture
+
+The architecture of our program follows this relationship between its modules:
+
+![ARQUITECTURA](https://github.com/lucasviner/practica2-AP2/assets/167958211/f0fbbfaf-cfe1-4190-a212-e60af8f9ec10)
+
+
+It should be noted that having a dependency on a program has been interpreted as requiring data from it, not merely needing a type initialized in another module.
 
 
 ### What each program does
@@ -206,15 +216,6 @@ This script is designed to generate routes for the Medieval Routes Project, conn
 7. Save KML:
 
   - Generates and saves a KML file for visualization in Google Earth, including the nodes and edges of the route graph.
-
-### Program Architecture
-
-The architecture of our program follows this relationship between its modules:
-
-![ARQUITECTURA](https://github.com/lucasviner/practica2-AP2/assets/167958211/f0fbbfaf-cfe1-4190-a212-e60af8f9ec10)
-
-
-It should be noted that having a dependency on a program has been interpreted as requiring data from it, not merely needing a type initialized in another module.
 
 ### Getting Started
 
